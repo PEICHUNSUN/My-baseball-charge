@@ -34,17 +34,8 @@ button{cursor:pointer;font-size:15px;font-weight:500;border:none;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
 /* ── 電腦版 layout ── */
-#desktop-wrap{
-  display:block;
-}
-
-#mobile-header,
-#mobile-content,
-#side-menu,
-#overlay,
-#mobile-nav{
-  display:none;
-}
+#desktop-wrap{display:block;}
+#mobile-header,#mobile-content,#side-menu,#overlay,#mobile-nav{display:none;}
 .tabbar{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:28px;padding:5px;overflow-x:auto;margin-bottom:20px;}
 .tabbar::-webkit-scrollbar{height:0;}
 .tab{padding:9px 18px;border-radius:22px;border:none;font-size:14px;font-weight:600;white-space:nowrap;transition:all .2s;background:transparent;color:var(--text2);}
@@ -52,141 +43,19 @@ button{cursor:pointer;font-size:15px;font-weight:500;border:none;}
 
 /* ── 手機版 layout ── */
 @media(max-width:600px){
-
-  /* 隱藏電腦版 */
-  #desktop-wrap{
-    display:none;
-  }
-
-  /* Header */
-  #mobile-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    height:56px;
-    padding:0 16px;
-    background:var(--bg2);
-    border-bottom:1px solid var(--border);
-    z-index:100;
-  }
-
-  /* 內容區（👉 這裡原本少一個 } 已修好） */
-  #mobile-content{
-    display:block;
-    padding:72px 16px max(100px, calc(100px + env(safe-area-inset-bottom)));
-  }
-
-  /* 底部 nav */
-  #mobile-nav{
-    display:flex;
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:var(--bg2);
-    border-top:1px solid var(--border);
-    z-index:100;
-    padding:8px 0 max(8px,env(safe-area-inset-bottom));
-  }
-
-  .nav-item{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:3px;
-    padding:4px 2px;
-    background:none;
-    border:none;
-    cursor:pointer;
-    color:var(--text3);
-    font-size:10px;
-    font-weight:600;
-  }
-
-  .nav-item.active{
-    color:var(--accent);
-  }
-
-  .nav-icon{
-    font-size:22px;
-    line-height:1;
-  }
-
-  /* ⭐ 側邊選單（關鍵修正） */
-  #side-menu{
-    display:block; /* ← 這行很重要 */
-    position:fixed;
-    top:0;
-    left:0;
-    width:72%;
-    max-width:260px;
-    height:100vh;
-    background:var(--bg2);
-    border-right:1px solid var(--border);
-    z-index:300;
-    transform:translateX(-100%);
-    transition:transform .28s cubic-bezier(.4,0,.2,1);
-    padding-top:56px;
-  }
-
-  #side-menu.open{
-    transform:translateX(0);
-  }
-
-  /* 背景遮罩 */
-  #overlay{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:299;
-  }
-
-  #overlay.open{
-    display:block;
-  }
-
-  .menu-item{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:16px 20px;
-    font-size:16px;
-    font-weight:600;
-    color:var(--text1);
-    border:none;
-    background:none;
-    width:100%;
-    text-align:left;
-    cursor:pointer;
-    border-bottom:1px solid var(--bg3);
-  }
-
-  .menu-item.active{
-    color:var(--accent);
-  }
-
-  /* 卡片全寬 */
-  .grid3{
-    grid-template-columns:1fr!important;
-  }
-
-  .grid2{
-    grid-template-columns:1fr!important;
-  }
-
-  .stat-card{
-    padding:16px 18px!important;
-  }
-
-  .card{
-    padding:16px!important;
-  }
+  #desktop-wrap{display:none;}
+  #mobile-header{display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;height:56px;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:100;}
+  #mobile-content{display:block;padding:72px 16px max(100px,calc(100px + env(safe-area-inset-bottom)));}
+  #side-menu{display:block;position:fixed;top:0;left:0;width:72%;max-width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:300;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);padding-top:56px;}
+  #side-menu.open{transform:translateX(0);}
+  #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:299;}
+  #overlay.open{display:block;}
+  .menu-item{display:flex;align-items:center;gap:14px;padding:16px 20px;font-size:16px;font-weight:600;color:var(--text1);border:none;background:none;width:100%;text-align:left;cursor:pointer;border-bottom:1px solid var(--bg3);}
+  .menu-item.active{color:var(--accent);}
+  .grid3{grid-template-columns:1fr!important;}
+  .grid2{grid-template-columns:1fr!important;}
+  .stat-card{padding:16px 18px!important;}
+  .card{padding:16px!important;}
 }
 </style>
 <script type="module">
@@ -204,6 +73,10 @@ const CC={餐飲:"#f87171",交通:"#4f8ef7",娛樂:"#fbbf24",購物:"#f472b6",�
 const MLB=[["#003087","#fff","NYY"],["#BD3039","#fff","BOS"],["#003831","#EFB21E","OAK"],["#0C2340","#fff","LAD"],["#C41E3A","#fff","STL"],["#EB6E1F","#000","SFG"],["#002D62","#fff","CHC"],["#003278","#fff","HOU"],["#E81828","#fff","CIN"]];
 const INIT_ACC=[{id:2,name:"台新帳戶",balance:3352,mlb:0},{id:3,name:"元大帳戶",balance:228,mlb:1},{id:4,name:"中信帳戶",balance:331,mlb:2},{id:5,name:"華南帳戶",balance:59,mlb:3},{id:6,name:"郵局帳戶",balance:8953,mlb:4},{id:7,name:"Leger",balance:117620,mlb:5},{id:8,name:"MAX",balance:25216,mlb:6},{id:9,name:"定期定額",balance:58338,mlb:7}];
 const TABS=[{id:"dashboard",icon:"⚡",label:"總覽"},{id:"assets",icon:"🏦",label:"資產"},{id:"log",icon:"📝",label:"記帳"},{id:"credit",icon:"💳",label:"信用卡"},{id:"invest",icon:"📈",label:"投資"},{id:"charts",icon:"📊",label:"圖表"}];
+
+// 投資類別顏色
+const US_COLOR="#4f8ef7";   // 美股：藍色
+const CRYPTO_COLOR="#fbbf24"; // 加密貨幣：金黃色
 
 const fmt=n=>"NT$"+Math.round(n).toLocaleString();
 const fmtUSD=n=>"US$"+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -237,101 +110,13 @@ window.openMenu=()=>{document.getElementById("side-menu")?.classList.add("open")
 window.closeMenu=()=>{document.getElementById("side-menu")?.classList.remove("open");document.getElementById("overlay")?.classList.remove("open");};
 window.setTabMenu=t=>{tab=t;window.closeMenu();render();};
 
-// ── 取得目前「看得到」的欄位，避免手機版/電腦版重複 id 抓錯 ──
-function getVisibleEl(id) {
-  const els = Array.from(document.querySelectorAll(`#${id}`));
+function getVisibleEl(id){const els=Array.from(document.querySelectorAll(`#${id}`));return els.find(el=>{const r=el.getBoundingClientRect(),s=window.getComputedStyle(el);return s.display!=="none"&&s.visibility!=="hidden"&&r.width>0&&r.height>0;})||document.getElementById(id);}
+function getVal(id){return getVisibleEl(id)?.value??"";}
 
-  return els.find(el => {
-    const rect = el.getBoundingClientRect();
-    const style = window.getComputedStyle(el);
-    return (
-      style.display !== "none" &&
-      style.visibility !== "hidden" &&
-      rect.width > 0 &&
-      rect.height > 0
-    );
-  }) || document.getElementById(id);
-}
-
-function getVal(id) {
-  return getVisibleEl(id)?.value ?? "";
-}
-
-window.submitEntry = () => {
-  const amt = +getVal("eAmt");
-
-  if (!amt || amt <= 0) {
-    alert("請輸入有效金額");
-    return;
-  }
-
-  mut(() => state.entries.unshift({
-    id: Date.now(),
-    date: getVal("eDate"),
-    amt,
-    cat: getVal("eCat"),
-    note: getVal("eNote")
-  }));
-};
-
-window.submitAddAcc = () => {
-  const name = getVal("accName").trim();
-  const bal = +getVal("accBal") || 0;
-
-  if (!name) {
-    alert("請輸入帳戶名稱");
-    return;
-  }
-
-  mut(() => state.accounts.push({
-    id: Date.now(),
-    name,
-    balance: bal,
-    mlb: state.accounts.length % MLB.length
-  }));
-};
-
-window.submitCred = () => {
-  const name = getVal("cName").trim();
-  const total = +getVal("cTotal");
-  const installments = +getVal("cInst") || 1;
-  const startDate = getVal("cStart");
-
-  if (!name || !total) {
-    alert("請輸入消費名稱與總金額");
-    return;
-  }
-
-  mut(() => state.credits.push({
-    id: Date.now(),
-    name,
-    total,
-    installments,
-    startDate
-  }));
-};
-
-window.submitPort = () => {
-  const symbol = getVal("pSym").trim().toUpperCase();
-  const cgId = getVal("pCg").trim().toLowerCase();
-  const units = +getVal("pUnits");
-  const costPerUnit = +getVal("pCost");
-  const type = getVal("pType");
-
-  if (!symbol || !units || !costPerUnit) {
-    alert("請輸入代號、持有數量與成本價");
-    return;
-  }
-
-  mut(() => state.portfolio.push({
-    id: Date.now(),
-    symbol,
-    cgId,
-    units,
-    costPerUnit,
-    type
-  }));
-};
+window.submitEntry=()=>{const amt=+getVal("eAmt");if(!amt||amt<=0){alert("請輸入有效金額");return;}mut(()=>state.entries.unshift({id:Date.now(),date:getVal("eDate"),amt,cat:getVal("eCat"),note:getVal("eNote")}));};
+window.submitAddAcc=()=>{const name=getVal("accName").trim();if(!name){alert("請輸入帳戶名稱");return;}mut(()=>state.accounts.push({id:Date.now(),name,balance:+getVal("accBal")||0,mlb:state.accounts.length%MLB.length}));};
+window.submitCred=()=>{const name=getVal("cName").trim(),total=+getVal("cTotal"),installments=+getVal("cInst")||1,startDate=getVal("cStart");if(!name||!total){alert("請輸入消費名稱與總金額");return;}mut(()=>state.credits.push({id:Date.now(),name,total,installments,startDate}));};
+window.submitPort=()=>{const symbol=getVal("pSym").trim().toUpperCase(),cgId=getVal("pCg").trim().toLowerCase(),units=+getVal("pUnits"),costPerUnit=+getVal("pCost"),type=getVal("pType");if(!symbol||!units||!costPerUnit){alert("請輸入代號、持有數量與成本價");return;}mut(()=>state.portfolio.push({id:Date.now(),symbol,cgId,units,costPerUnit,type}));};
 
 function calc(){
   const me=state.entries.filter(e=>e.date.startsWith(filterMonth));
@@ -345,22 +130,44 @@ function calc(){
   return{me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets:totalBank+portfolioValue};
 }
 
+// ── 圖表（修正：確保 canvas 存在後才繪製）────────────────
 const charts={};
-function mkChart(id,cfg){if(charts[id]){charts[id].destroy();delete charts[id];}const c=document.getElementById(id);if(c)charts[id]=new Chart(c,cfg);}
+function mkChart(id,cfg){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const c=document.getElementById(id);
+  if(c) charts[id]=new Chart(c,cfg);
+}
 const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+fmt(ctx.raw)}}}};
 
 function renderCharts(me,totalBank,monthInc,monthExp,portfolioValue){
-  if(monthInc||monthExp)mkChart("pie1",{type:"pie",data:{labels:["收入","支出"],datasets:[{data:[monthInc,monthExp],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  // 圖1：收支比
+  if(monthInc||monthExp){
+    mkChart("pie1",{type:"pie",data:{labels:["收入","支出"],datasets:[{data:[monthInc,monthExp],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  }
+  // 圖2：支出分類
   const cats=EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c));
-  if(cats.length)mkChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
-  if(totalBank||portfolioValue)mkChart("pie3",{type:"pie",data:{labels:["現金/銀行","投資組合"],datasets:[{data:[totalBank,portfolioValue],backgroundColor:["#4f8ef7","#a78bfa"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  if(cats.length){
+    mkChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  }
+  // 圖3：資產大類
+  if(totalBank||portfolioValue){
+    mkChart("pie3",{type:"pie",data:{labels:["現金/銀行","投資組合"],datasets:[{data:[totalBank,portfolioValue],backgroundColor:["#4f8ef7","#a78bfa"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  }
 }
 
 function mlbBadge(idx){const[bg,tc,lb]=MLB[idx%MLB.length];return `<div class="mlb-badge" style="background:${bg};color:${tc};">${lb}</div>`;}
 const lbl=t=>`<div class="label" style="margin-bottom:2px;">${t}</div>`;
 const sc=(label,value,color,accent)=>`<div class="stat-card" style="--accent-line:${accent||color||"var(--accent)"}"><div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${label}</div><div style="font-size:20px;font-weight:700;color:${color||"var(--text1)"};">${value}</div></div>`;
 const dot=(c,l,v)=>`<span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);"><span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block;"></span>${l}${v?` <strong style="color:var(--text1);">${v}</strong>`:""}</span>`;
-const pie=(title,id,legs,extra="")=>`<div style="margin-bottom:24px;"><div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div><div style="position:relative;height:200px;"${extra}><canvas id="${id}"></canvas></div></div>`;
+
+// ── 圖表區塊 HTML（canvas 一定要在 DOM 裡）────────────────
+function pieSection(title,id,legs){
+  return `<div style="margin-bottom:24px;">
+    <div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div>
+    <div style="position:relative;height:200px;"><canvas id="${id}"></canvas></div>
+  </div>`;
+}
 
 function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets){
   const rankLabel=avg>=0.4?"全壘打儲蓄王 ★":avg>=0.3?"強力打擊手":avg>=0.2?"安全上壘":avg>=0.1?"揮棒練習中":"";
@@ -433,26 +240,110 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
     <div class="glow-line"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;"><span style="font-size:14px;color:var(--text2);font-weight:600;">本月應付合計</span><span style="font-size:20px;font-weight:800;color:#f87171;">${fmt(monthCredit)}</span></div>`;
 
-  if(tab==="invest") return `
-    <div class="card" style="margin-bottom:18px;">
-      <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent);">新增持倉 📈</div>
-      <div style="margin-bottom:10px;">${lbl("類型")}<select id="pType"><option value="us">美股（USD→自動換算TWD）</option><option value="tw">台股（NT$）</option><option value="crypto">加密貨幣（NT$）</option></select></div>
-      <div class="grid2" style="margin-bottom:10px;"><div>${lbl("代號（AAPL/2330/BTC）")}<input id="pSym" placeholder="AAPL" type="text"></div><div>${lbl("CoinGecko ID（加密幣）")}<input id="pCg" placeholder="bitcoin" type="text"></div></div>
-      <div class="grid2" style="margin-bottom:14px;"><div>${lbl("持有數量")}<input type="number" id="pUnits" placeholder="10"></div><div>${lbl("成本價")}<input type="number" id="pCost" placeholder="150"></div></div>
-      <button class="btn-green" onclick="submitPort()" style="width:100%;padding:13px;font-size:16px;">新增持倉</button>
-    </div>
-    ${state.portfolio.map(p=>{const isUS=p.type==="us";const costTWD=isUS?p.costPerUnit*p.units*usdTwd:p.costPerUnit*p.units;return`<div class="card" style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><span style="font-size:16px;font-weight:700;">${p.symbol}</span><span class="tag" style="margin-left:8px;background:var(--bg4);color:var(--text2);">${isUS?"美股":p.type==="tw"?"台股":"加密幣"}</span></div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:15px;font-weight:700;color:#a78bfa;">${fmt(costTWD)}</span><button class="btn-del" onclick="delPort(${p.id})">×</button></div></div><div style="font-size:11px;color:var(--text3);margin-top:4px;">${p.units}${p.type==="crypto"?"顆":"股"} · 成本 ${isUS?fmtUSD(p.costPerUnit):"NT$"+p.costPerUnit}${isUS?` · 換算${fmt(costTWD)}`:""}</div></div>`;}).join("")}
-    <div class="glow-line"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;"><span style="font-size:14px;color:var(--text2);">投資組合估值（TWD）</span><span style="font-size:20px;font-weight:800;color:#a78bfa;">${fmt(portfolioValue)}</span></div>
-    <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:right;">匯率：1 USD = ${usdTwd.toFixed(2)} TWD</div>`;
+  // ── 投資頁面（分兩類：美股 / 加密貨幣）──────────────
+  if(tab==="invest"){
+    const usStocks=state.portfolio.filter(p=>p.type==="us");
+    const cryptos=state.portfolio.filter(p=>p.type==="crypto");
+    const usTotalUSD=usStocks.reduce((s,p)=>s+p.costPerUnit*p.units,0);
+    const usTotalTWD=usTotalUSD*usdTwd;
+    const cryptoTotal=cryptos.reduce((s,p)=>s+p.costPerUnit*p.units,0);
 
+    const usCards=usStocks.length===0
+      ? `<div style="font-size:13px;color:var(--text3);padding:12px 0;">尚無美股持倉。</div>`
+      : usStocks.map(p=>{
+          const usd=p.costPerUnit*p.units;
+          const twd=usd*usdTwd;
+          return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${US_COLOR};">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span style="font-size:16px;font-weight:700;color:${US_COLOR};">${p.symbol}</span>
+                <span class="tag" style="margin-left:8px;background:rgba(79,142,247,.15);color:${US_COLOR};">美股</span>
+              </div>
+              <button class="btn-del" onclick="delPort(${p.id})">×</button>
+            </div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+              <div style="background:var(--bg4);border-radius:8px;padding:6px 12px;">
+                <div style="font-size:10px;color:var(--text3);">美金總額</div>
+                <div style="font-size:15px;font-weight:700;color:${US_COLOR};">${fmtUSD(usd)}</div>
+              </div>
+              <div style="background:var(--bg4);border-radius:8px;padding:6px 12px;">
+                <div style="font-size:10px;color:var(--text3);">換算台幣</div>
+                <div style="font-size:15px;font-weight:700;color:var(--text1);">${fmt(twd)}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}股 · 成本 ${fmtUSD(p.costPerUnit)}/股 · 匯率 ${usdTwd.toFixed(2)}</div>
+          </div>`;}).join("");
+
+    const cryptoCards=cryptos.length===0
+      ? `<div style="font-size:13px;color:var(--text3);padding:12px 0;">尚無加密貨幣持倉。</div>`
+      : cryptos.map(p=>{
+          const twd=p.costPerUnit*p.units;
+          return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${CRYPTO_COLOR};">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span style="font-size:16px;font-weight:700;color:${CRYPTO_COLOR};">${p.symbol}</span>
+                <span class="tag" style="margin-left:8px;background:rgba(251,191,36,.15);color:${CRYPTO_COLOR};">加密貨幣</span>
+              </div>
+              <button class="btn-del" onclick="delPort(${p.id})">×</button>
+            </div>
+            <div style="margin-top:8px;">
+              <div style="background:var(--bg4);border-radius:8px;padding:6px 12px;display:inline-block;">
+                <div style="font-size:10px;color:var(--text3);">持倉價值</div>
+                <div style="font-size:15px;font-weight:700;color:${CRYPTO_COLOR};">${fmt(twd)}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}顆 · 成本 NT$${p.costPerUnit}/顆</div>
+          </div>`;}).join("");
+
+    return `
+      <div class="card" style="margin-bottom:18px;">
+        <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent);">新增持倉 📈</div>
+        <div style="margin-bottom:10px;">${lbl("類型")}<select id="pType"><option value="us">📈 美股（USD → 自動換算TWD）</option><option value="crypto">🪙 加密貨幣（NT$）</option></select></div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div>${lbl("代號（如 AAPL / BTC）")}<input id="pSym" placeholder="AAPL" type="text"></div>
+          <div>${lbl("CoinGecko ID（加密幣用）")}<input id="pCg" placeholder="bitcoin" type="text"></div>
+        </div>
+        <div class="grid2" style="margin-bottom:14px;">
+          <div>${lbl("持有數量")}<input type="number" id="pUnits" placeholder="10"></div>
+          <div>${lbl("成本價（USD / NT$）")}<input type="number" id="pCost" placeholder="150"></div>
+        </div>
+        <button class="btn-green" onclick="submitPort()" style="width:100%;padding:13px;font-size:16px;">新增持倉</button>
+      </div>
+
+      <!-- 美股區塊 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:4px;height:20px;border-radius:2px;background:${US_COLOR};"></div>
+        <span style="font-size:15px;font-weight:700;color:${US_COLOR};">📈 美股</span>
+        ${usStocks.length>0?`<span style="font-size:12px;color:var(--text3);margin-left:auto;">${fmtUSD(usTotalUSD)} ≈ ${fmt(usTotalTWD)}</span>`:""}
+      </div>
+      ${usCards}
+
+      <div class="glow-line"></div>
+
+      <!-- 加密貨幣區塊 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:4px;height:20px;border-radius:2px;background:${CRYPTO_COLOR};"></div>
+        <span style="font-size:15px;font-weight:700;color:${CRYPTO_COLOR};">🪙 加密貨幣</span>
+        ${cryptos.length>0?`<span style="font-size:12px;color:var(--text3);margin-left:auto;">${fmt(cryptoTotal)}</span>`:""}
+      </div>
+      ${cryptoCards}
+
+      <div class="glow-line"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;">
+        <span style="font-size:14px;color:var(--text2);">投資組合總估值（TWD）</span>
+        <span style="font-size:20px;font-weight:800;color:#a78bfa;">${fmt(portfolioValue)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:right;">即時匯率：1 USD = ${usdTwd.toFixed(2)} TWD</div>`;
+  }
+
+  // ── 圖表頁面（修正：用 pieSection 函式確保 canvas 存在）──
   if(tab==="charts") return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">${lbl("月份")}<input type="month" value="${filterMonth}" onchange="setMonth(this.value)" style="width:auto;padding:8px 12px;font-size:14px;margin-top:0;"></div>
-    ${pie("本月收支比","pie1",[dot("#00d4a0","收入",fmt(monthInc)),dot("#f87171","支出",fmt(monthExp))].join(""))}
+    ${pieSection("本月收支比","pie1",[dot("#00d4a0","收入",fmt(monthInc)),dot("#f87171","支出",fmt(monthExp))].join(""))}
     <div class="glow-line"></div>
-    ${pie("支出分類","pie2",EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c)).map(c=>{const v=me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0);return dot(CC[c],c,monthExp>0?Math.round(v/monthExp*100)+"%":"");}).join(""))}
+    ${pieSection("支出分類","pie2",EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c)).map(c=>{const v=me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0);return dot(CC[c],c,monthExp>0?Math.round(v/monthExp*100)+"%":"");}).join(""))}
     <div class="glow-line"></div>
-    ${pie("全部資產大類佔比","pie3",[dot("#4f8ef7","現金/銀行",fmt(totalBank)),dot("#a78bfa","投資組合",fmt(portfolioValue))].join(""))}`;
+    ${pieSection("全部資產大類佔比","pie3",[dot("#4f8ef7","現金/銀行",fmt(totalBank)),dot("#a78bfa","投資組合",fmt(portfolioValue))].join(""))}`;
 
   return "";
 }
@@ -465,12 +356,9 @@ function render(){
   const{me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets}=calc();
   const content=buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets);
   const curTab=TABS.find(t=>t.id===tab)||TABS[0];
-
-  // 電腦版 tab bar
   const tabBar=`<div class="tabbar">${TABS.map(t=>`<button class="tab${tab===t.id?" active":""}" onclick="setTab('${t.id}')">${t.icon} ${t.label}</button>`).join("")}</div>`;
 
   root.innerHTML=`
-    <!-- 手機 Header (fixed top) -->
     <div id="mobile-header">
       <button onclick="openMenu()" style="background:none;border:none;color:var(--text1);font-size:26px;padding:4px 8px;line-height:1;cursor:pointer;">☰</button>
       <div style="font-size:15px;font-weight:800;color:var(--text1);">${curTab.icon} ${curTab.label}</div>
@@ -479,8 +367,6 @@ function render(){
         <div style="font-size:14px;font-weight:900;color:var(--accent);">${fmt(totalAssets)}</div>
       </div>
     </div>
-
-    <!-- 手機側邊選單 -->
     <div id="side-menu">
       <div style="padding:16px 20px 20px;border-bottom:1px solid var(--border);">
         <div style="font-size:16px;font-weight:900;color:var(--accent);">⚾ 個人財務記分板</div>
@@ -490,11 +376,7 @@ function render(){
       <button class="menu-item" onclick="logout()" style="color:#f87171;margin-top:8px;">🚪 登出</button>
     </div>
     <div id="overlay" onclick="closeMenu()"></div>
-
-    <!-- 手機內容 -->
     <div id="mobile-content">${content}</div>
-
-    <!-- 電腦版 -->
     <div id="desktop-wrap" style="max-width:760px;margin:0 auto;padding:20px 16px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
         <div style="font-size:32px;filter:drop-shadow(0 0 12px #00d4a080);">⚾</div>
@@ -518,7 +400,7 @@ function render(){
       <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center;">⚾ 個人財務記分板 · Firebase 雲端同步</div>
     </div>
   `;
-  if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),50);
+  if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),80);
 }
 </script>
 </head>
