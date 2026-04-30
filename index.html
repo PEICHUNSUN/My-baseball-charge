@@ -140,40 +140,119 @@ function mkChart(id,cfg){
 const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+fmt(ctx.raw)}}}};
 
 function renderCharts(me,totalBank,monthInc,monthExp,portfolioValue){
-  // 找到目前可見的 canvas（電腦版或手機版）
-  function visibleCanvas(id){
-    const all=document.querySelectorAll(`canvas#${id}`);
-    for(const c of all){
-      const p=c.closest("#desktop-wrap")||c.closest("#mobile-content");
-      if(!p)continue;
-      if(window.getComputedStyle(p).display!=="none") return c;
+
+  function isVisible(el){
+    if(!el) return false;
+    const rect = el.getBoundingClientRect();
+    const style = window.getComputedStyle(el);
+    return style.display !== "none" &&
+           style.visibility !== "hidden" &&
+           rect.width > 0 &&
+           rect.height > 0;
+  }
+
+  function visibleCanvas(chartName){
+    const all = Array.from(document.querySelectorAll(`canvas[data-chart="${chartName}"]`));
+    return all.find(c => {
+      const wrap = c.closest("#mobile-content") || c.closest("#desktop-wrap");
+      return wrap && isVisible(wrap);
+    });
+  }
+
+  function drawChart(chartName,cfg){
+    if(charts[chartName]){
+      charts[chartName].destroy();
+      delete charts[chartName];
     }
-    return document.getElementById(id);
-  }
-  function drawChart(id,cfg){
-    if(charts[id]){charts[id].destroy();delete charts[id];}
-    const c=visibleCanvas(id);
-    if(c) charts[id]=new Chart(c,cfg);
-  }
 
-  // 圖1：收支比 — 就算都是0也畫（顯示空白提示）
-  drawChart("pie1",{type:"pie",data:{
-    labels:["收入","支出"],
-    datasets:[{data:[monthInc||0.001,monthExp||0.001],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]
-  },options:{...pieOpts,plugins:{...pieOpts.plugins,tooltip:{callbacks:{label:ctx=>ctx.raw<1?" NT$0":" "+fmt(ctx.raw)}}}}}); 
+    const canvas = visibleCanvas(chartName);
+    if(!canvas) return;
 
-  // 圖2：支出分類
-  const cats=EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c));
-  if(cats.length){
-    drawChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
+    charts[chartName] = new Chart(canvas,cfg);
   }
 
-  // 圖3：資產大類 — 就算投資是0也畫
-  drawChart("pie3",{type:"pie",data:{
-    labels:["現金/銀行","投資組合"],
-    datasets:[{data:[totalBank||0.001,portfolioValue||0.001],backgroundColor:["#4f8ef7","#a78bfa"],borderWidth:0,hoverOffset:6}]
-  },options:{...pieOpts,plugins:{...pieOpts.plugins,tooltip:{callbacks:{label:ctx=>ctx.raw<1?" NT$0":" "+fmt(ctx.raw)}}}}}); 
+  drawChart("pie1",{
+    type:"pie",
+    data:{
+      labels:["收入","支出"],
+      datasets:[{
+        data:[monthInc || 0.001, monthExp || 0.001],
+        backgroundColor:["#00d4a0","#f87171"],
+        borderWidth:0,
+        hoverOffset:6
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx => ctx.raw < 1 ? " NT$0" : " " + fmt(ctx.raw)
+          }
+        }
+      }
+    }
+  });
+
+  const cats = EXPENSE_CATS.filter(c => me.some(e => e.cat === c));
+
+  drawChart("pie2",{
+    type:"pie",
+    data:{
+      labels: cats.length ? cats : ["尚無支出"],
+      datasets:[{
+        data: cats.length
+          ? cats.map(c => me.filter(e => e.cat === c).reduce((s,e)=>s+e.amt,0))
+          : [0.001],
+        backgroundColor: cats.length ? cats.map(c => CC[c]) : ["#2a2a45"],
+        borderWidth:0,
+        hoverOffset:6
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx => ctx.raw < 1 ? " NT$0" : " " + fmt(ctx.raw)
+          }
+        }
+      }
+    }
+  });
+
+  drawChart("pie3",{
+    type:"pie",
+    data:{
+      labels:["現金/銀行","投資組合"],
+      datasets:[{
+        data:[totalBank || 0.001, portfolioValue || 0.001],
+        backgroundColor:["#4f8ef7","#a78bfa"],
+        borderWidth:0,
+        hoverOffset:6
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx => ctx.raw < 1 ? " NT$0" : " " + fmt(ctx.raw)
+          }
+        }
+      }
+    }
+  });
 }
+  
+
+
 
 function mlbBadge(idx){const[bg,tc,lb]=MLB[idx%MLB.length];return `<div class="mlb-badge" style="background:${bg};color:${tc};">${lb}</div>`;}
 const lbl=t=>`<div class="label" style="margin-bottom:2px;">${t}</div>`;
@@ -181,11 +260,13 @@ const sc=(label,value,color,accent)=>`<div class="stat-card" style="--accent-lin
 const dot=(c,l,v)=>`<span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);"><span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block;"></span>${l}${v?` <strong style="color:var(--text1);">${v}</strong>`:""}</span>`;
 
 // ── 圖表區塊 HTML（canvas 一定要在 DOM 裡）────────────────
-function pieSection(title,id,legs){
+function pieSection(title, chartName, legs){
   return `<div style="margin-bottom:24px;">
     <div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div>
-    <div style="position:relative;height:200px;"><canvas id="${id}"></canvas></div>
+    <div style="position:relative;height:220px;width:100%;">
+      <canvas data-chart="${chartName}"></canvas>
+    </div>
   </div>`;
 }
 
