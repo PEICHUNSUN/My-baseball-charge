@@ -237,10 +237,101 @@ window.openMenu=()=>{document.getElementById("side-menu")?.classList.add("open")
 window.closeMenu=()=>{document.getElementById("side-menu")?.classList.remove("open");document.getElementById("overlay")?.classList.remove("open");};
 window.setTabMenu=t=>{tab=t;window.closeMenu();render();};
 
-window.submitEntry=()=>{const amt=+document.getElementById("eAmt")?.value;if(!amt||amt<=0)return;mut(()=>state.entries.unshift({id:Date.now(),date:document.getElementById("eDate").value,amt,cat:document.getElementById("eCat").value,note:document.getElementById("eNote").value}));};
-window.submitAddAcc=()=>{const name=document.getElementById("accName")?.value.trim();if(!name)return;mut(()=>state.accounts.push({id:Date.now(),name,balance:+document.getElementById("accBal")?.value||0,mlb:state.accounts.length%MLB.length}));};
-window.submitCred=()=>{const name=document.getElementById("cName")?.value.trim(),total=+document.getElementById("cTotal")?.value,inst=+document.getElementById("cInst")?.value||1,start=document.getElementById("cStart")?.value;if(!name||!total)return;mut(()=>state.credits.push({id:Date.now(),name,total,installments:inst,startDate:start}));};
-window.submitPort=()=>{const sym=document.getElementById("pSym")?.value.trim().toUpperCase(),cg=document.getElementById("pCg")?.value.trim().toLowerCase(),units=+document.getElementById("pUnits")?.value,cost=+document.getElementById("pCost")?.value,type=document.getElementById("pType")?.value;if(!sym||!units||!cost)return;mut(()=>state.portfolio.push({id:Date.now(),symbol:sym,cgId:cg,units,costPerUnit:cost,type}));};
+// ── 取得目前「看得到」的欄位，避免手機版/電腦版重複 id 抓錯 ──
+function getVisibleEl(id) {
+  const els = Array.from(document.querySelectorAll(`#${id}`));
+
+  return els.find(el => {
+    const rect = el.getBoundingClientRect();
+    const style = window.getComputedStyle(el);
+    return (
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      rect.width > 0 &&
+      rect.height > 0
+    );
+  }) || document.getElementById(id);
+}
+
+function getVal(id) {
+  return getVisibleEl(id)?.value ?? "";
+}
+
+window.submitEntry = () => {
+  const amt = +getVal("eAmt");
+
+  if (!amt || amt <= 0) {
+    alert("請輸入有效金額");
+    return;
+  }
+
+  mut(() => state.entries.unshift({
+    id: Date.now(),
+    date: getVal("eDate"),
+    amt,
+    cat: getVal("eCat"),
+    note: getVal("eNote")
+  }));
+};
+
+window.submitAddAcc = () => {
+  const name = getVal("accName").trim();
+  const bal = +getVal("accBal") || 0;
+
+  if (!name) {
+    alert("請輸入帳戶名稱");
+    return;
+  }
+
+  mut(() => state.accounts.push({
+    id: Date.now(),
+    name,
+    balance: bal,
+    mlb: state.accounts.length % MLB.length
+  }));
+};
+
+window.submitCred = () => {
+  const name = getVal("cName").trim();
+  const total = +getVal("cTotal");
+  const installments = +getVal("cInst") || 1;
+  const startDate = getVal("cStart");
+
+  if (!name || !total) {
+    alert("請輸入消費名稱與總金額");
+    return;
+  }
+
+  mut(() => state.credits.push({
+    id: Date.now(),
+    name,
+    total,
+    installments,
+    startDate
+  }));
+};
+
+window.submitPort = () => {
+  const symbol = getVal("pSym").trim().toUpperCase();
+  const cgId = getVal("pCg").trim().toLowerCase();
+  const units = +getVal("pUnits");
+  const costPerUnit = +getVal("pCost");
+  const type = getVal("pType");
+
+  if (!symbol || !units || !costPerUnit) {
+    alert("請輸入代號、持有數量與成本價");
+    return;
+  }
+
+  mut(() => state.portfolio.push({
+    id: Date.now(),
+    symbol,
+    cgId,
+    units,
+    costPerUnit,
+    type
+  }));
+};
 
 function calc(){
   const me=state.entries.filter(e=>e.date.startsWith(filterMonth));
