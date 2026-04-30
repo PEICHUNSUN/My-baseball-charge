@@ -8,15 +8,31 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0a0a14;color:#e8e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;font-size:16px;}
+/* 手機版 */
 @media(max-width:600px){
-  .grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .grid3{grid-template-columns:1fr!important;}
   .grid2{grid-template-columns:1fr!important;}
-  .tabbar{gap:2px;}
-  .tab{padding:8px 10px!important;font-size:12px!important;}
-  .stat-card{padding:10px 12px!important;}
-  .card{padding:14px 16px!important;}
-  .mlb-badge{width:32px!important;height:32px!important;font-size:9px!important;}
+  .stat-card{padding:16px!important;border-radius:16px!important;}
+  .stat-card div:last-child{font-size:24px!important;}
+  .card{padding:16px!important;border-radius:16px!important;}
+  .tabbar{display:none!important;}
+  .desktop-header-right{display:none!important;}
+  .mobile-header{display:flex!important;}
+  .mobile-menu{display:block!important;}
+  .row{padding:14px 0!important;}
 }
+/* 手機 Header */
+.mobile-header{display:none;align-items:center;justify-content:space-between;padding:16px;background:#12121f;border-bottom:1px solid #2a2a45;position:sticky;top:0;z-index:100;}
+.hamburger{background:none;border:none;color:#e8e8f0;font-size:26px;cursor:pointer;padding:4px 8px;line-height:1;}
+/* 側邊選單 */
+.mobile-menu{display:none;position:fixed;top:0;left:0;width:75%;max-width:280px;height:100vh;background:#12121f;border-right:1px solid #2a2a45;z-index:200;transform:translateX(-100%);transition:transform .3s ease;padding-top:60px;}
+.mobile-menu.open{transform:translateX(0);}
+.menu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199;}
+.menu-overlay.open{display:block;}
+.menu-item{display:flex;align-items:center;gap:14px;padding:16px 24px;font-size:17px;font-weight:600;color:#e8e8f0;border:none;background:none;width:100%;text-align:left;cursor:pointer;border-bottom:1px solid #1a1a2e;transition:background .15s;}
+.menu-item.active{color:#00d4a0;background:rgba(0,212,160,.08);}
+.menu-item:hover{background:#1a1a2e;}
+.menu-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#888;font-size:24px;cursor:pointer;}
 :root{--bg1:#0a0a14;--bg2:#12121f;--bg3:#1a1a2e;--bg4:#22223a;--accent:#00d4a0;--accent2:#4f8ef7;--accent3:#a78bfa;--red:#f87171;--yellow:#fbbf24;--border:#2a2a45;--text1:#f0f0ff;--text2:#a0a0c0;--text3:#606080;}
 .card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
 .glow{box-shadow:0 0 24px rgba(0,212,160,0.08);}
@@ -467,9 +483,36 @@ function render(){
     `;
   }
 
+  const MENU_TABS=[{id:"dashboard",label:"⚡ 總覽"},{id:"assets",label:"🏦 資產"},{id:"log",label:"📝 記帳"},{id:"credit",label:"💳 信用卡"},{id:"invest",label:"📈 投資"},{id:"charts",label:"📊 圖表"}];
+
   root.innerHTML=`
+    <!-- 手機漢堡選單 -->
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="menu-close" onclick="closeMenu()">×</button>
+      <div style="padding:16px 24px 24px;border-bottom:1px solid #2a2a45;margin-bottom:8px;">
+        <div style="font-size:18px;font-weight:900;color:#00d4a0;">⚾ 個人財務記分板</div>
+        <div style="font-size:12px;color:#606080;margin-top:4px;">${user.displayName||""}</div>
+      </div>
+      ${MENU_TABS.map(t=>`<button class="menu-item${currentTab===t.id?" active":""}" onclick="setTabMobile('${t.id}')">${t.label}</button>`).join("")}
+      <button class="menu-item" onclick="logout()" style="color:#f87171;margin-top:auto;border-top:1px solid #2a2a45;">🚪 登出</button>
+    </div>
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+
+    <!-- 手機版 Header -->
+    <div class="mobile-header">
+      <button class="hamburger" onclick="openMenu()">☰</button>
+      <div style="text-align:center;">
+        <div style="font-size:15px;font-weight:900;color:#e8e8f0;">⚾ ${MENU_TABS.find(t=>t.id===currentTab)?.label||"總覽"}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:#606080;">總資產</div>
+        <div style="font-size:14px;font-weight:900;color:#00d4a0;">${fmt(totalAssets)}</div>
+      </div>
+    </div>
+
+    <!-- 電腦版主體 -->
     <div style="max-width:760px;margin:0 auto;padding:20px 16px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;" class="desktop-header-right">
         <div style="font-size:32px;filter:drop-shadow(0 0 12px #00d4a080);">⚾</div>
         <div>
           <div style="font-size:22px;font-weight:900;color:var(--text1);letter-spacing:-.5px;">個人財務記分板</div>
@@ -491,6 +534,11 @@ function render(){
       <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center;letter-spacing:.5px;">⚾ 個人財務記分板 · Firebase 雲端同步</div>
     </div>
   `;
+
+  // 選單開關
+  window.openMenu=()=>{document.getElementById("mobileMenu").classList.add("open");document.getElementById("menuOverlay").classList.add("open");};
+  window.closeMenu=()=>{document.getElementById("mobileMenu").classList.remove("open");document.getElementById("menuOverlay").classList.remove("open");};
+  window.setTabMobile=t=>{closeMenu();currentTab=t;render();};
   if(currentTab==="charts") setTimeout(renderCharts,50);
 }
 
