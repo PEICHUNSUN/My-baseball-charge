@@ -324,8 +324,6 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
   if(tab==="invest"){
     const usStocks=state.portfolio.filter(p=>p.type==="us");
     const cryptos=state.portfolio.filter(p=>p.type==="crypto");
-    const usTotalCostUSD=usStocks.reduce((s,p)=>s+p.costPerUnit*p.units,0);
-    const cryptoTotalCost=cryptos.reduce((s,p)=>s+p.costPerUnit*p.units,0);
 
     // 美股卡片
     const usCards=usStocks.length===0
@@ -379,33 +377,52 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
           <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}股 · 匯率 ${usdTwd.toFixed(2)}</div>
         </div>`;}).join("");
 
-    // 加密貨幣卡片
-    const cryptoCards=cryptos.length===0
+    // 加密貨幣卡片（合併同標的）
+    const cryptoMerged=Object.values(cryptos.reduce((acc,p)=>{
+      if(!acc[p.symbol]){acc[p.symbol]={...p};}
+      else{
+        const totalCost=acc[p.symbol].costPerUnit*acc[p.symbol].units+p.costPerUnit*p.units;
+        const totalUnits=acc[p.symbol].units+p.units;
+        acc[p.symbol].costPerUnit=totalCost/totalUnits; // 加權平均成本
+        acc[p.symbol].units=totalUnits;
+        acc[p.symbol].id=p.symbol; // 合併後用 symbol 當 id
+        acc[p.symbol]._merged=true;
+      }
+      return acc;
+    },{}));
+
+    const cryptoCards=cryptoMerged.length===0
       ?`<div style="font-size:13px;color:var(--text3);padding:12px 0;">尚無加密貨幣持倉。</div>`
-      :cryptos.map(p=>{
+      :cryptoMerged.map(p=>{
         const cgId=CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase();
         const cached=priceCache["crypto_"+cgId];
         const liveUSD=cached?.price;
         const liveTWD=liveUSD?liveUSD*p.units*usdTwd:null;
-        const costTWD=p.costPerUnit*p.units;
-        const pct=liveUSD?((liveUSD-p.costPerUnit)/p.costPerUnit*100):null;
+        const costTWD=p.costPerUnit*p.units; // 成本是台幣
+        // 損益：需要把成本台幣換算成USD來跟liveUSD比較
+        const costUSD=p.costPerUnit/usdTwd;
+        const pct=liveUSD?((liveUSD-costUSD)/costUSD*100):null;
         const pctColor=pct===null?"var(--text3)":pct>=0?"#00d4a0":"#f87171";
         const pctStr=pct===null?"—":(pct>=0?"+":"")+pct.toFixed(2)+"%";
+        // 找到原始所有筆記錄的 ids 用於刪除
+        const ids=cryptos.filter(c=>c.symbol===p.symbol).map(c=>c.id);
+        const delCall=ids.map(id=>`delPort(${id})`).join(";");
         return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${CRYPTO_COLOR};">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <div>
               <span style="font-size:16px;font-weight:700;color:${CRYPTO_COLOR};">${p.symbol}</span>
               <span class="tag" style="margin-left:8px;background:rgba(251,191,36,.15);color:${CRYPTO_COLOR};">加密貨幣</span>
+              ${ids.length>1?`<span class="tag" style="margin-left:4px;background:rgba(255,255,255,.08);color:var(--text3);">${ids.length}筆合併</span>`:""}
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:14px;font-weight:700;color:${pctColor};">${pctStr}</span>
-              <button class="btn-del" onclick="delPort(${p.id})">×</button>
+              <button class="btn-del" onclick="${delCall}">×</button>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;">
             <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">成本價(USD)</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text2);">${fmtUSD(p.costPerUnit)}</div>
+              <div style="font-size:10px;color:var(--text3);">均攤成本(TWD)</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text2);">NT${p.costPerUnit.toFixed(0)}</div>
             </div>
             <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
               <div style="font-size:10px;color:var(--text3);">即時價(USD)</div>
@@ -416,10 +433,16 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
               <div style="font-size:13px;font-weight:700;color:${pctColor};">${pctStr}</div>
             </div>
           </div>
-          <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:10px;color:var(--text3);">持倉市值（TWD）</div>
-            <div style="font-size:16px;font-weight:700;color:${CRYPTO_COLOR};">${liveTWD?fmt(liveTWD):fmt(costTWD)}</div>
-            ${liveTWD?"":`<div style="font-size:9px;color:var(--text3);">（成本估算，點「刷新報價」取得即時價格）</div>`}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--text3);">持倉成本(TWD)</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text2);">${fmt(costTWD)}</div>
+            </div>
+            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--text3);">市值(TWD)</div>
+              <div style="font-size:14px;font-weight:700;color:${CRYPTO_COLOR};">${liveTWD?fmt(liveTWD):fmt(costTWD)}</div>
+              ${!liveTWD?`<div style="font-size:9px;color:var(--text3);">成本估算</div>`:""}
+            </div>
           </div>
           <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}顆 · CoinGecko: ${cgId}</div>
         </div>`;}).join("");
