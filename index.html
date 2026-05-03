@@ -178,48 +178,142 @@ function mergePortfolio(list){
   },{}));
 }
 
-const charts={};
-function getVisibleCanvas(id){
-  // 找到目前顯示中的那個 canvas
-  const all=Array.from(document.querySelectorAll(`canvas[data-chart="${id}"]`));
-  for(const c of all){
-    let p=c.parentElement;
-    while(p){
-      if(p.id==="desktop-wrap"||p.id==="mobile-content"){
-        if(window.getComputedStyle(p).display!=="none") return c;
-        break;
-      }
-      p=p.parentElement;
-    }
+// ── 圖表修正版：避免手機版/電腦版重複 canvas 導致抓錯 ──
+const charts = {};
+
+function getActiveWrap(){
+  const mobile = document.getElementById("mobile-content");
+  const desktop = document.getElementById("desktop-wrap");
+
+  if (mobile && window.getComputedStyle(mobile).display !== "none") {
+    return mobile;
   }
-  return all[0]||null;
+
+  if (desktop && window.getComputedStyle(desktop).display !== "none") {
+    return desktop;
+  }
+
+  return document;
 }
-function mkChart(id,cfg){
-  if(charts[id]){charts[id].destroy();delete charts[id];}
-  const c=getVisibleCanvas(id);
-  if(c) charts[id]=new Chart(c,cfg);
+
+function getActiveCanvas(chartName){
+  const wrap = getActiveWrap();
+  return wrap.querySelector(`canvas[data-chart="${chartName}"]`);
 }
-const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(Math.max(0,ctx.raw))}`}}}};
+
+function drawPie(chartName, labels, data, colors){
+  const canvas = getActiveCanvas(chartName);
+  if (!canvas) return;
+
+  if (!window.Chart) {
+    console.error("Chart.js 尚未載入");
+    return;
+  }
+
+  if (charts[chartName]) {
+    charts[chartName].destroy();
+    delete charts[chartName];
+  }
+
+  charts[chartName] = new window.Chart(canvas, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const value = ctx.raw < 1 ? 0 : ctx.raw;
+              return " " + fmt(value);
+            }
+          }
+        }
+      }
+    }
+  });
+}
 
 function renderCharts(me,totalBank,monthInc,monthExp,portfolioValue){
-  // 圖1：收支比
-  mkChart("pie1",{type:"pie",data:{labels:["收入","支出"],datasets:[{data:[monthInc||0.001,monthExp||0.001],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
+
+  // 圖1：本月收支比
+  drawPie(
+    "pie1",
+    ["收入","支出"],
+    [monthInc || 0.001, monthExp || 0.001],
+    ["#00d4a0","#f87171"]
+  );
+
   // 圖2：支出分類
-  const cats=EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c));
-  if(cats.length)mkChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
-  // 圖3：資產大類（現金/銀行 + 四種投資分開）
-  const usVal=state.portfolio.filter(p=>p.type==="us").reduce((s,p)=>s+p.costPerUnit*p.units*usdTwd,0);
-  const cryptoVal=state.portfolio.filter(p=>p.type==="crypto").reduce((s,p)=>s+p.costPerUnit*p.units,0);
-  const twVal=state.portfolio.filter(p=>p.type==="tw").reduce((s,p)=>s+p.costPerUnit*p.units,0);
-  const fundVal=state.portfolio.filter(p=>p.type==="fund").reduce((s,p)=>s+p.costPerUnit*p.units,0);
-  const labels=["現金/銀行"];
-  const data=[totalBank||0.001];
-  const colors=["#4f8ef7"];
-  if(usVal){labels.push("美股");data.push(usVal);colors.push(INV_COLOR.us);}
-  if(cryptoVal){labels.push("加密貨幣");data.push(cryptoVal);colors.push(INV_COLOR.crypto);}
-  if(twVal){labels.push("台股");data.push(twVal);colors.push(INV_COLOR.tw);}
-  if(fundVal){labels.push("基金");data.push(fundVal);colors.push(INV_COLOR.fund);}
-  mkChart("pie3",{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  const cats = EXPENSE_CATS.filter(c => me.some(e => e.cat === c));
+
+  drawPie(
+    "pie2",
+    cats.length ? cats : ["尚無支出"],
+    cats.length
+      ? cats.map(c => me.filter(e => e.cat === c).reduce((s,e)=>s+e.amt,0))
+      : [0.001],
+    cats.length
+      ? cats.map(c => CC[c])
+      : ["#2a2a45"]
+  );
+
+  // 圖3：資產大類
+  const usVal = state.portfolio
+    .filter(p => p.type === "us")
+    .reduce((s,p)=>s+p.costPerUnit*p.units*usdTwd,0);
+
+  const cryptoVal = state.portfolio
+    .filter(p => p.type === "crypto")
+    .reduce((s,p)=>s+p.costPerUnit*p.units,0);
+
+  const twVal = state.portfolio
+    .filter(p => p.type === "tw")
+    .reduce((s,p)=>s+p.costPerUnit*p.units,0);
+
+  const fundVal = state.portfolio
+    .filter(p => p.type === "fund")
+    .reduce((s,p)=>s+p.costPerUnit*p.units,0);
+
+  const labels = ["現金/銀行"];
+  const data = [totalBank || 0.001];
+  const colors = ["#4f8ef7"];
+
+  if (usVal > 0) {
+    labels.push("美股");
+    data.push(usVal);
+    colors.push(INV_COLOR.us);
+  }
+
+  if (cryptoVal > 0) {
+    labels.push("加密貨幣");
+    data.push(cryptoVal);
+    colors.push(INV_COLOR.crypto);
+  }
+
+  if (twVal > 0) {
+    labels.push("台股");
+    data.push(twVal);
+    colors.push(INV_COLOR.tw);
+  }
+
+  if (fundVal > 0) {
+    labels.push("基金");
+    data.push(fundVal);
+    colors.push(INV_COLOR.fund);
+  }
+
+  drawPie("pie3", labels, data, colors);
 }
 
 function mlbBadge(idx){const[bg,tc,lb]=MLB[idx%MLB.length];return `<div class="mlb-badge" style="background:${bg};color:${tc};">${lb}</div>`;}
@@ -491,7 +585,13 @@ function render(){
       <div>${content}</div>
       <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center;">⚾ 個人財務記分板 · Firebase 雲端同步</div>
     </div>`;
-  if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),200);
+  if(tab==="charts"){
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      renderCharts(me,totalBank,monthInc,monthExp,portfolioValue);
+    }, 100);
+  });
+}
 }
 </script>
 </head>
