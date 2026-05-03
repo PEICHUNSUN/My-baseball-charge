@@ -98,14 +98,15 @@ const todayM=()=>today().slice(0,7);
 let state={accounts:INIT_ACC,entries:[],credits:[],portfolio:[],monthlySnapshots:{}};
 let tab="dashboard",filterMonth=todayM(),user=null,unsub=null,saveTimer=null,usdTwd=31.5;
 
-// 抓美股即時價格
+// 抓美股即時價格（Finnhub）
+const FINNHUB_KEY="d7rjhj9r01qgahvdrg2gd7rjhj9r01qgahvdrg30";
 async function fetchStockPrice(symbol){
   if(priceCache[symbol]&&Date.now()-priceCache[symbol].updatedAt<5*60*1000) return priceCache[symbol].price;
   try{
-    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
+    const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
     const d=await r.json();
-    const price=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    if(price){priceCache[symbol]={price,updatedAt:Date.now()};return price;}
+    const price=d?.c; // c = current price
+    if(price&&price>0){priceCache[symbol]={price,updatedAt:Date.now()};return price;}
   }catch{}
   return null;
 }
