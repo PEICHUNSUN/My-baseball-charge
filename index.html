@@ -179,8 +179,27 @@ function mergePortfolio(list){
 }
 
 const charts={};
-function mkChart(id,cfg){if(charts[id]){charts[id].destroy();delete charts[id];}const c=document.getElementById(id);if(c)charts[id]=new Chart(c,cfg);}
-const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw<1?0:ctx.raw)}`}}}};
+function getVisibleCanvas(id){
+  // 找到目前顯示中的那個 canvas
+  const all=Array.from(document.querySelectorAll(`canvas[data-chart="${id}"]`));
+  for(const c of all){
+    let p=c.parentElement;
+    while(p){
+      if(p.id==="desktop-wrap"||p.id==="mobile-content"){
+        if(window.getComputedStyle(p).display!=="none") return c;
+        break;
+      }
+      p=p.parentElement;
+    }
+  }
+  return all[0]||null;
+}
+function mkChart(id,cfg){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const c=getVisibleCanvas(id);
+  if(c) charts[id]=new Chart(c,cfg);
+}
+const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(Math.max(0,ctx.raw))}`}}}};
 
 function renderCharts(me,totalBank,monthInc,monthExp,portfolioValue){
   // 圖1：收支比
@@ -207,7 +226,7 @@ function mlbBadge(idx){const[bg,tc,lb]=MLB[idx%MLB.length];return `<div class="m
 const lbl=t=>`<div class="label" style="margin-bottom:2px;">${t}</div>`;
 const sc=(label,value,color,accent)=>`<div class="stat-card" style="--accent-line:${accent||color||"var(--accent)"}"><div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${label}</div><div style="font-size:20px;font-weight:700;color:${color||"var(--text1)"};">${value}</div></div>`;
 const dot=(c,l,v)=>`<span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);"><span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block;"></span>${l}${v?` <strong style="color:var(--text1);">${v}</strong>`:""}</span>`;
-function pieSection(title,id,legs){return `<div style="margin-bottom:24px;"><div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div><div style="position:relative;height:200px;"><canvas id="${id}"></canvas></div></div>`;}
+function pieSection(title,id,legs){return `<div style="margin-bottom:24px;"><div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div><div style="position:relative;height:220px;"><canvas data-chart="${id}"></canvas></div></div>`;}
 
 // ── 投資卡片產生器 ───────────────────────────────────
 function invCard(p,type){
@@ -472,7 +491,7 @@ function render(){
       <div>${content}</div>
       <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center;">⚾ 個人財務記分板 · Firebase 雲端同步</div>
     </div>`;
-  if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),150);
+  if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),200);
 }
 </script>
 </head>
