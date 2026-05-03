@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg1:#0a0a14;--bg2:#12121f;--bg3:#1a1a2e;--bg4:#22223a;--accent:#00d4a0;--accent2:#4f8ef7;--accent3:#a78bfa;--red:#f87171;--yellow:#fbbf24;--border:#2a2a45;--text1:#f0f0ff;--text2:#a0a0c0;--text3:#606080;}
+:root{--bg1:#0a0a14;--bg2:#12121f;--bg3:#1a1a2e;--bg4:#22223a;--accent:#00d4a0;--border:#2a2a45;--text1:#f0f0ff;--text2:#a0a0c0;--text3:#606080;}
 body{background:var(--bg1);color:var(--text1);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;}
 input,select{display:block;width:100%;font-size:15px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg4);color:var(--text1);margin-top:4px;transition:border .2s;}
 input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,160,.15);}
@@ -15,8 +15,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 option{background:#1a1a2e;}
 button{cursor:pointer;font-size:15px;font-weight:500;border:none;}
 .btn-green{padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#00d4a0,#00b386);color:#000;font-weight:700;}
-.btn-del{background:none;color:var(--text3);font-size:22px;padding:0 6px;line-height:1;transition:color .2s;}
-.btn-del:hover{color:var(--red);}
+.btn-del{background:none;color:var(--text3);font-size:22px;padding:0 6px;line-height:1;}
 .card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
 .label{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;}
 .row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
@@ -32,16 +31,12 @@ button{cursor:pointer;font-size:15px;font-weight:500;border:none;}
 ::-webkit-scrollbar{width:6px;height:4px;}
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-
-/* ── 電腦版 layout ── */
 #desktop-wrap{display:block;}
-#mobile-header,#mobile-content,#side-menu,#overlay,#mobile-nav{display:none;}
+#mobile-header,#mobile-content,#side-menu,#overlay{display:none;}
 .tabbar{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:28px;padding:5px;overflow-x:auto;margin-bottom:20px;}
 .tabbar::-webkit-scrollbar{height:0;}
 .tab{padding:9px 18px;border-radius:22px;border:none;font-size:14px;font-weight:600;white-space:nowrap;transition:all .2s;background:transparent;color:var(--text2);}
 .tab.active{background:linear-gradient(135deg,#00d4a0,#00b386);color:#000;}
-
-/* ── 手機版 layout ── */
 @media(max-width:600px){
   #desktop-wrap{display:none;}
   #mobile-header{display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;height:56px;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:100;}
@@ -64,7 +59,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
 import { getFirestore, doc, setDoc, onSnapshot } from "https://cdn.jsdelivr.net/npm/firebase@10.12.0/firestore/+esm";
 
 const fbApp=initializeApp({apiKey:"AIzaSyDZhrjrg6vIW7Fqld-OmV3rbmTRDAndvZo",authDomain:"my-baseball-charge.firebaseapp.com",projectId:"my-baseball-charge",storageBucket:"my-baseball-charge.firebasestorage.app",messagingSenderId:"972554550098",appId:"1:972554550098:web:7170e4e575d9d56d8d988b"});
-const auth=getAuth(fbApp), db=getFirestore(fbApp);
+const auth=getAuth(fbApp),db=getFirestore(fbApp);
 
 const EXPENSE_CATS=["餐飲","交通","娛樂","購物","醫療","帳單","其他支出"];
 const INCOME_CATS=["薪資","其他收入"];
@@ -75,20 +70,13 @@ const INIT_ACC=[{id:2,name:"台新帳戶",balance:3352,mlb:0},{id:3,name:"元大
 const TABS=[{id:"dashboard",icon:"⚡",label:"總覽"},{id:"assets",icon:"🏦",label:"資產"},{id:"log",icon:"📝",label:"記帳"},{id:"credit",icon:"💳",label:"信用卡"},{id:"invest",icon:"📈",label:"投資"},{id:"charts",icon:"📊",label:"圖表"}];
 
 // 投資類別顏色
-const US_COLOR="#4f8ef7";
-const CRYPTO_COLOR="#fbbf24";
+const INV_COLOR={us:"#4f8ef7",crypto:"#fbbf24",tw:"#00d4a0",fund:"#f472b6"};
+const INV_LABEL={us:"📈 美股",crypto:"🪙 加密貨幣",tw:"🏢 台股",fund:"💼 基金"};
 
-// 常見加密貨幣名稱 → CoinGecko ID 對照表
-const CRYPTO_ID_MAP={
-  "BTC":"bitcoin","ETH":"ethereum","USDT":"tether","BNB":"binancecoin",
-  "SOL":"solana","XRP":"ripple","USDC":"usd-coin","ADA":"cardano",
-  "DOGE":"dogecoin","TRX":"tron","TON":"the-open-network","AVAX":"avalanche-2",
-  "SHIB":"shiba-inu","DOT":"polkadot","LINK":"chainlink","MATIC":"matic-network",
-  "LTC":"litecoin","BCH":"bitcoin-cash","UNI":"uniswap","ATOM":"cosmos",
-};
+const CRYPTO_ID_MAP={BTC:"bitcoin",ETH:"ethereum",USDT:"tether",BNB:"binancecoin",SOL:"solana",XRP:"ripple",USDC:"usd-coin",ADA:"cardano",DOGE:"dogecoin",TRX:"tron",TON:"the-open-network",AVAX:"avalanche-2",SHIB:"shiba-inu",DOT:"polkadot",LINK:"chainlink",MATIC:"matic-network",LTC:"litecoin",BCH:"bitcoin-cash",UNI:"uniswap",ATOM:"cosmos"};
 
-// 即時價格快取
-let priceCache={}; // {symbol: {price, updatedAt}}
+const FINNHUB_KEY="d7rjhj9r01qgahvdrg2gd7rjhj9r01qgahvdrg30";
+let priceCache={};
 
 const fmt=n=>"NT$"+Math.round(n).toLocaleString();
 const fmtUSD=n=>"US$"+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -98,45 +86,26 @@ const todayM=()=>today().slice(0,7);
 let state={accounts:INIT_ACC,entries:[],credits:[],portfolio:[],monthlySnapshots:{}};
 let tab="dashboard",filterMonth=todayM(),user=null,unsub=null,saveTimer=null,usdTwd=31.5;
 
-// 抓美股即時價格（Finnhub）
-const FINNHUB_KEY="d7rjhj9r01qgahvdrg2gd7rjhj9r01qgahvdrg30";
-async function fetchStockPrice(symbol){
-  if(priceCache[symbol]&&Date.now()-priceCache[symbol].updatedAt<5*60*1000) return priceCache[symbol].price;
-  try{
-    const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
-    const d=await r.json();
-    const price=d?.c; // c = current price
-    if(price&&price>0){priceCache[symbol]={price,updatedAt:Date.now()};return price;}
-  }catch{}
-  return null;
-}
+async function fetchRate(){try{const r=await fetch("https://api.exchangerate-api.com/v4/latest/USD");const d=await r.json();if(d.rates?.TWD)usdTwd=d.rates.TWD;}catch{}}
+fetchRate();
 
-// 抓加密貨幣即時價格（USD）
+async function fetchStockPrice(symbol){
+  if(priceCache[symbol]&&Date.now()-priceCache[symbol].updatedAt<5*60*1000)return priceCache[symbol].price;
+  try{const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);const d=await r.json();const p=d?.c;if(p&&p>0){priceCache[symbol]={price:p,updatedAt:Date.now()};return p;}}catch{}return null;
+}
 async function fetchCryptoPrice(cgId){
   const key="crypto_"+cgId;
-  if(priceCache[key]&&Date.now()-priceCache[key].updatedAt<5*60*1000) return priceCache[key].price;
-  try{
-    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${cgId}&vs_currencies=usd`);
-    const d=await r.json();
-    const price=d?.[cgId]?.usd;
-    if(price){priceCache[key]={price,updatedAt:Date.now()};return price;}
-  }catch{}
-  return null;
+  if(priceCache[key]&&Date.now()-priceCache[key].updatedAt<5*60*1000)return priceCache[key].price;
+  try{const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${cgId}&vs_currencies=usd`);const d=await r.json();const p=d?.[cgId]?.usd;if(p){priceCache[key]={price:p,updatedAt:Date.now()};return p;}}catch{}return null;
 }
-
-// 更新所有持倉即時價格並重新 render
 window.refreshPrices=async()=>{
   const btn=document.getElementById("refreshBtn");
   if(btn){btn.textContent="更新中...";btn.disabled=true;}
   priceCache={};
-  const jobs=state.portfolio.map(async p=>{
-    if(p.type==="us") return fetchStockPrice(p.symbol);
-    if(p.type==="crypto"){
-      const cgId=CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase();
-      return fetchCryptoPrice(cgId);
-    }
-  });
-  await Promise.all(jobs);
+  await Promise.all(state.portfolio.map(async p=>{
+    if(p.type==="us")return fetchStockPrice(p.symbol);
+    if(p.type==="crypto")return fetchCryptoPrice(CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase());
+  }));
   render();
 };
 
@@ -152,7 +121,7 @@ function mut(fn){fn();saveToCloud();render();}
 window.delEntry=id=>mut(()=>state.entries=state.entries.filter(x=>x.id!==id));
 window.delAcc=id=>mut(()=>state.accounts=state.accounts.filter(a=>a.id!==id));
 window.delCred=id=>mut(()=>state.credits=state.credits.filter(c=>c.id!==id));
-window.delPort=id=>mut(()=>state.portfolio=state.portfolio.filter(p=>p.id!==id));
+window.delPort=id=>mut(()=>{state.portfolio=state.portfolio.filter(p=>p.id!==id);});
 window.updateAccBal=(id,v)=>mut(()=>state.accounts=state.accounts.map(a=>a.id===id?{...a,balance:+v}:a));
 window.setTab=t=>{tab=t;render();};
 window.setMonth=m=>{filterMonth=m;render();};
@@ -161,22 +130,24 @@ window.openMenu=()=>{document.getElementById("side-menu")?.classList.add("open")
 window.closeMenu=()=>{document.getElementById("side-menu")?.classList.remove("open");document.getElementById("overlay")?.classList.remove("open");};
 window.setTabMenu=t=>{tab=t;window.closeMenu();render();};
 
-function getVisibleEl(id){const els=Array.from(document.querySelectorAll(`#${id}`));return els.find(el=>{const r=el.getBoundingClientRect(),s=window.getComputedStyle(el);return s.display!=="none"&&s.visibility!=="hidden"&&r.width>0&&r.height>0;})||document.getElementById(id);}
-function getVal(id){return getVisibleEl(id)?.value??"";}
+function getVal(id){
+  const els=Array.from(document.querySelectorAll(`[data-fid="${id}"]`));
+  const vis=els.find(el=>{const s=window.getComputedStyle(el.closest("#desktop-wrap")||el.closest("#mobile-content")||el);return s.display!=="none";});
+  return (vis||els[0])?.value??"";
+}
 
 window.submitEntry=()=>{const amt=+getVal("eAmt");if(!amt||amt<=0){alert("請輸入有效金額");return;}mut(()=>state.entries.unshift({id:Date.now(),date:getVal("eDate"),amt,cat:getVal("eCat"),note:getVal("eNote")}));};
 window.submitAddAcc=()=>{const name=getVal("accName").trim();if(!name){alert("請輸入帳戶名稱");return;}mut(()=>state.accounts.push({id:Date.now(),name,balance:+getVal("accBal")||0,mlb:state.accounts.length%MLB.length}));};
-window.submitCred=()=>{const name=getVal("cName").trim(),total=+getVal("cTotal"),installments=+getVal("cInst")||1,startDate=getVal("cStart");if(!name||!total){alert("請輸入消費名稱與總金額");return;}mut(()=>state.credits.push({id:Date.now(),name,total,installments,startDate}));};
+window.submitCred=()=>{const name=getVal("cName").trim(),total=+getVal("cTotal"),inst=+getVal("cInst")||1,startDate=getVal("cStart");if(!name||!total){alert("請輸入消費名稱與總金額");return;}mut(()=>state.credits.push({id:Date.now(),name,total,installments:inst,startDate}));};
 window.submitPort=()=>{
   const symbol=getVal("pSym").trim().toUpperCase();
   const units=+getVal("pUnits");
   const costPerUnit=+getVal("pCost");
   const type=getVal("pType");
   if(!symbol||!units||!costPerUnit){alert("請輸入代號、持有數量與成本價");return;}
-  // 加密幣自動對應 CoinGecko ID
   const cgId=type==="crypto"?(CRYPTO_ID_MAP[symbol]||symbol.toLowerCase()):"";
   mut(()=>state.portfolio.push({id:Date.now(),symbol,cgId,units,costPerUnit,type}));
-};;
+};
 
 function calc(){
   const me=state.entries.filter(e=>e.date.startsWith(filterMonth));
@@ -186,66 +157,140 @@ function calc(){
   const savings=monthInc-monthExp,avg=monthInc>0?Math.min(savings/monthInc,1):0;
   const tm=todayM();
   const monthCredit=state.credits.reduce((s,c)=>{const ms=Array.from({length:c.installments},(_,i)=>{const d=new Date(c.startDate);d.setMonth(d.getMonth()+i);return d.toISOString().slice(0,7);});return ms.includes(tm)?s+Math.round(c.total/c.installments):s;},0);
-  const portfolioValue=state.portfolio.reduce((s,p)=>s+(p.type==="us"?p.costPerUnit*p.units*usdTwd:p.costPerUnit*p.units),0);
+  const portfolioValue=state.portfolio.reduce((s,p)=>{
+    const v=p.type==="us"?p.costPerUnit*p.units*usdTwd:p.costPerUnit*p.units;
+    return s+v;
+  },0);
   return{me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets:totalBank+portfolioValue};
 }
 
-// ── 圖表（修正：確保 canvas 存在後才繪製）────────────────
-const charts={};
-function mkChart(id,cfg){
-  if(charts[id]){charts[id].destroy();delete charts[id];}
-  const c=document.getElementById(id);
-  if(c) charts[id]=new Chart(c,cfg);
+// 合併同標的
+function mergePortfolio(list){
+  return Object.values(list.reduce((acc,p)=>{
+    if(!acc[p.symbol]){acc[p.symbol]={...p,_ids:[p.id]};}
+    else{
+      const tot=acc[p.symbol].costPerUnit*acc[p.symbol].units+p.costPerUnit*p.units;
+      acc[p.symbol].units+=p.units;
+      acc[p.symbol].costPerUnit=tot/acc[p.symbol].units;
+      acc[p.symbol]._ids.push(p.id);
+    }
+    return acc;
+  },{}));
 }
-const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+fmt(ctx.raw)}}}};
+
+const charts={};
+function mkChart(id,cfg){if(charts[id]){charts[id].destroy();delete charts[id];}const c=document.getElementById(id);if(c)charts[id]=new Chart(c,cfg);}
+const pieOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw<1?0:ctx.raw)}`}}}};
 
 function renderCharts(me,totalBank,monthInc,monthExp,portfolioValue){
-  // 找到目前可見的 canvas（電腦版或手機版）
-  function visibleCanvas(id){
-    const all=document.querySelectorAll(`canvas#${id}`);
-    for(const c of all){
-      const p=c.closest("#desktop-wrap")||c.closest("#mobile-content");
-      if(!p)continue;
-      if(window.getComputedStyle(p).display!=="none") return c;
-    }
-    return document.getElementById(id);
-  }
-  function drawChart(id,cfg){
-    if(charts[id]){charts[id].destroy();delete charts[id];}
-    const c=visibleCanvas(id);
-    if(c) charts[id]=new Chart(c,cfg);
-  }
-
-  // 圖1：收支比 — 就算都是0也畫（顯示空白提示）
-  drawChart("pie1",{type:"pie",data:{
-    labels:["收入","支出"],
-    datasets:[{data:[monthInc||0.001,monthExp||0.001],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]
-  },options:{...pieOpts,plugins:{...pieOpts.plugins,tooltip:{callbacks:{label:ctx=>ctx.raw<1?" NT$0":" "+fmt(ctx.raw)}}}}}); 
-
+  // 圖1：收支比
+  mkChart("pie1",{type:"pie",data:{labels:["收入","支出"],datasets:[{data:[monthInc||0.001,monthExp||0.001],backgroundColor:["#00d4a0","#f87171"],borderWidth:0,hoverOffset:6}]},options:pieOpts});
   // 圖2：支出分類
   const cats=EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c));
-  if(cats.length){
-    drawChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
-  }
-
-  // 圖3：資產大類 — 就算投資是0也畫
-  drawChart("pie3",{type:"pie",data:{
-    labels:["現金/銀行","投資組合"],
-    datasets:[{data:[totalBank||0.001,portfolioValue||0.001],backgroundColor:["#4f8ef7","#a78bfa"],borderWidth:0,hoverOffset:6}]
-  },options:{...pieOpts,plugins:{...pieOpts.plugins,tooltip:{callbacks:{label:ctx=>ctx.raw<1?" NT$0":" "+fmt(ctx.raw)}}}}}); 
+  if(cats.length)mkChart("pie2",{type:"pie",data:{labels:cats,datasets:[{data:cats.map(c=>me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0)),backgroundColor:cats.map(c=>CC[c]),borderWidth:0,hoverOffset:6}]},options:pieOpts});
+  // 圖3：資產大類（現金/銀行 + 四種投資分開）
+  const usVal=state.portfolio.filter(p=>p.type==="us").reduce((s,p)=>s+p.costPerUnit*p.units*usdTwd,0);
+  const cryptoVal=state.portfolio.filter(p=>p.type==="crypto").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+  const twVal=state.portfolio.filter(p=>p.type==="tw").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+  const fundVal=state.portfolio.filter(p=>p.type==="fund").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+  const labels=["現金/銀行"];
+  const data=[totalBank||0.001];
+  const colors=["#4f8ef7"];
+  if(usVal){labels.push("美股");data.push(usVal);colors.push(INV_COLOR.us);}
+  if(cryptoVal){labels.push("加密貨幣");data.push(cryptoVal);colors.push(INV_COLOR.crypto);}
+  if(twVal){labels.push("台股");data.push(twVal);colors.push(INV_COLOR.tw);}
+  if(fundVal){labels.push("基金");data.push(fundVal);colors.push(INV_COLOR.fund);}
+  mkChart("pie3",{type:"pie",data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},options:pieOpts});
 }
 
 function mlbBadge(idx){const[bg,tc,lb]=MLB[idx%MLB.length];return `<div class="mlb-badge" style="background:${bg};color:${tc};">${lb}</div>`;}
 const lbl=t=>`<div class="label" style="margin-bottom:2px;">${t}</div>`;
 const sc=(label,value,color,accent)=>`<div class="stat-card" style="--accent-line:${accent||color||"var(--accent)"}"><div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${label}</div><div style="font-size:20px;font-weight:700;color:${color||"var(--text1)"};">${value}</div></div>`;
 const dot=(c,l,v)=>`<span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);"><span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block;"></span>${l}${v?` <strong style="color:var(--text1);">${v}</strong>`:""}</span>`;
+function pieSection(title,id,legs){return `<div style="margin-bottom:24px;"><div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div><div style="position:relative;height:200px;"><canvas id="${id}"></canvas></div></div>`;}
 
-// ── 圖表區塊 HTML（canvas 一定要在 DOM 裡）────────────────
-function pieSection(title,id,legs){
-  return `<div style="margin-bottom:24px;">
-    <div style="font-size:15px;font-weight:700;margin-bottom:8px;">${title}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">${legs}</div>
-    <div style="position:relative;height:200px;"><canvas id="${id}"></canvas></div>
+// ── 投資卡片產生器 ───────────────────────────────────
+function invCard(p,type){
+  const color=INV_COLOR[type];
+  const ids=p._ids;
+  const delCall=ids.map(id=>`delPort(${id})`).join(";");
+  const merged=ids.length>1;
+  const isUS=type==="us";
+  const isCrypto=type==="crypto";
+  const isTW=type==="tw";
+  const isFund=type==="fund";
+
+  // 取即時價格
+  let livePrice=null;
+  if(isUS){const c=priceCache[p.symbol];livePrice=c?.price||null;}
+  if(isCrypto){const cgId=CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase();const c=priceCache["crypto_"+cgId];livePrice=c?.price||null;}
+
+  // 計算損益
+  let pct=null;
+  if(isUS&&livePrice) pct=(livePrice-p.costPerUnit)/p.costPerUnit*100;
+  if(isCrypto&&livePrice){const costUSD=p.costPerUnit/usdTwd;pct=(livePrice-costUSD)/costUSD*100;}
+  const pctColor=pct===null?"var(--text3)":pct>=0?"#00d4a0":"#f87171";
+  const pctStr=pct===null?"—":(pct>=0?"+":"")+pct.toFixed(2)+"%";
+
+  // 市值
+  let mktTWD=null,mktUSD=null;
+  if(isUS){mktUSD=livePrice?livePrice*p.units:null;mktTWD=mktUSD?mktUSD*usdTwd:p.costPerUnit*p.units*usdTwd;}
+  if(isCrypto){mktTWD=livePrice?livePrice*p.units*usdTwd:p.costPerUnit*p.units;}
+  if(isTW||isFund) mktTWD=p.costPerUnit*p.units;
+
+  const costTWD=isUS?p.costPerUnit*p.units*usdTwd:p.costPerUnit*p.units;
+
+  return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${color};">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+        <span style="font-size:16px;font-weight:700;color:${color};">${p.symbol}</span>
+        <span class="tag" style="background:${color}22;color:${color};">${INV_LABEL[type].split(" ")[1]||INV_LABEL[type]}</span>
+        ${merged?`<span class="tag" style="background:rgba(255,255,255,.07);color:var(--text3);">${ids.length}筆合併</span>`:""}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        ${(isUS||isCrypto)?`<span style="font-size:14px;font-weight:700;color:${pctColor};">${pctStr}</span>`:""}
+        <button class="btn-del" onclick="${delCall}">×</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;">
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">均攤成本</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text2);">${isUS?fmtUSD(p.costPerUnit):"NT$"+Math.round(p.costPerUnit).toLocaleString()}</div>
+      </div>
+      ${(isUS||isCrypto)?`
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">即時價${isUS?"(USD)":"(USD)"}</div>
+        <div style="font-size:13px;font-weight:600;color:${color};">${livePrice?fmtUSD(livePrice):"—"}</div>
+      </div>
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">損益</div>
+        <div style="font-size:13px;font-weight:700;color:${pctColor};">${pctStr}</div>
+      </div>`:`
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">持有數量</div>
+        <div style="font-size:13px;font-weight:600;color:${color};">${p.units}${isTW?"股":"單位"}</div>
+      </div>
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">持倉成本</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text1);">${fmt(costTWD)}</div>
+      </div>`}
+    </div>
+    ${isUS?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">市值(USD)</div>
+        <div style="font-size:14px;font-weight:700;color:${color};">${mktUSD?fmtUSD(mktUSD):fmtUSD(p.costPerUnit*p.units)}</div>
+        ${!mktUSD?`<div style="font-size:9px;color:var(--text3);">成本估算</div>`:""}
+      </div>
+      <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;color:var(--text3);">市值(TWD)</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text1);">${fmt(mktTWD)}</div>
+      </div>
+    </div>`:`<div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
+      <div style="font-size:10px;color:var(--text3);">市值(TWD)</div>
+      <div style="font-size:14px;font-weight:700;color:${color};">${fmt(mktTWD)}</div>
+      ${isCrypto&&!livePrice?`<div style="font-size:9px;color:var(--text3);">成本估算，點刷新取得即時價</div>`:""}
+    </div>`}
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}${isUS?"股":isCrypto?"顆":isTW?"股":"單位"} · 匯率 ${usdTwd.toFixed(2)}</div>
   </div>`;
 }
 
@@ -282,8 +327,8 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
     <div style="font-size:16px;font-weight:700;margin-bottom:14px;">銀行 / 帳戶</div>
     ${state.accounts.map(a=>`<div class="row">${mlbBadge(a.mlb||0)}<div style="flex:1;font-size:15px;font-weight:600;">${a.name}</div><input type="number" value="${a.balance}" onchange="updateAccBal(${a.id},this.value)" style="width:120px;text-align:right;padding:7px 10px;margin-top:0;"><button class="btn-del" onclick="delAcc(${a.id})">×</button></div>`).join("")}
     <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end;">
-      <div style="flex:1;">${lbl("帳戶名稱")}<input id="accName" placeholder="玉山帳戶" type="text"></div>
-      <div style="width:130px;">${lbl("餘額")}<input id="accBal" placeholder="0" type="number"></div>
+      <div style="flex:1;">${lbl("帳戶名稱")}<input data-fid="accName" placeholder="玉山帳戶" type="text"></div>
+      <div style="width:130px;">${lbl("餘額")}<input data-fid="accBal" placeholder="0" type="number"></div>
       <button class="btn-green" onclick="submitAddAcc()">新增</button>
     </div>
     <div class="glow-line"></div>
@@ -296,11 +341,11 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
     <div class="card" style="margin-bottom:18px;">
       <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent);">新增記錄 ⚾</div>
       <div class="grid2" style="margin-bottom:10px;">
-        <div>${lbl("日期")}<input type="date" id="eDate" value="${today()}"></div>
-        <div>${lbl("類別")}<select id="eCat">${ALL_CATS.map(c=>`<option>${c}</option>`).join("")}</select></div>
+        <div>${lbl("日期")}<input type="date" data-fid="eDate" value="${today()}"></div>
+        <div>${lbl("類別")}<select data-fid="eCat">${ALL_CATS.map(c=>`<option>${c}</option>`).join("")}</select></div>
       </div>
-      <div style="margin-bottom:10px;">${lbl("金額 (NT$)")}<input type="number" id="eAmt" placeholder="0"></div>
-      <div style="margin-bottom:14px;">${lbl("備註（選填）")}<input type="text" id="eNote" placeholder="早餐、悠遊卡加值..."></div>
+      <div style="margin-bottom:10px;">${lbl("金額 (NT$)")}<input type="number" data-fid="eAmt" placeholder="0"></div>
+      <div style="margin-bottom:14px;">${lbl("備註（選填）")}<input type="text" data-fid="eNote" placeholder="早餐、悠遊卡加值..."></div>
       <button class="btn-green" onclick="submitEntry()" style="width:100%;padding:13px;font-size:16px;">⚾ 揮棒！</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">${lbl("月份")}<input type="month" value="${filterMonth}" onchange="setMonth(this.value)" style="width:auto;padding:8px 12px;font-size:14px;margin-top:0;"></div>
@@ -310,9 +355,9 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
   if(tab==="credit") return `
     <div class="card" style="margin-bottom:18px;">
       <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent);">新增分期 💳</div>
-      <div style="margin-bottom:10px;">${lbl("消費名稱")}<input id="cName" placeholder="iPhone 16 Pro" type="text"></div>
-      <div class="grid2" style="margin-bottom:10px;"><div>${lbl("總金額")}<input type="number" id="cTotal" placeholder="5000"></div><div>${lbl("分幾期")}<input type="number" id="cInst" min="1" placeholder="3"></div></div>
-      <div style="margin-bottom:14px;">${lbl("開始扣款日")}<input type="date" id="cStart" value="${today()}"></div>
+      <div style="margin-bottom:10px;">${lbl("消費名稱")}<input data-fid="cName" placeholder="iPhone 16 Pro" type="text"></div>
+      <div class="grid2" style="margin-bottom:10px;"><div>${lbl("總金額")}<input type="number" data-fid="cTotal" placeholder="5000"></div><div>${lbl("分幾期")}<input type="number" data-fid="cInst" min="1" placeholder="3"></div></div>
+      <div style="margin-bottom:14px;">${lbl("開始扣款日")}<input type="date" data-fid="cStart" value="${today()}"></div>
       <button class="btn-green" onclick="submitCred()" style="width:100%;padding:13px;font-size:16px;">新增分期</button>
     </div>
     ${state.credits.map(c=>{const monthly=Math.round(c.total/c.installments);const end=(()=>{const d=new Date(c.startDate);d.setMonth(d.getMonth()+(+c.installments-1));return d.toISOString().slice(0,7);})();let paid=0;for(let i=0;i<c.installments;i++){const d=new Date(c.startDate);d.setMonth(d.getMonth()+i);if(d.toISOString().slice(0,7)<=tm)paid++;}const done=paid>=c.installments;const pct=Math.min(paid/c.installments*100,100);
@@ -320,184 +365,76 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
     <div class="glow-line"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;"><span style="font-size:14px;color:var(--text2);font-weight:600;">本月應付合計</span><span style="font-size:20px;font-weight:800;color:#f87171;">${fmt(monthCredit)}</span></div>`;
 
-  // ── 投資頁面 ──────────────────────────────────────────
   if(tab==="invest"){
-    const usStocks=state.portfolio.filter(p=>p.type==="us");
-    const cryptos=state.portfolio.filter(p=>p.type==="crypto");
-
-    // 美股卡片
-    const usCards=usStocks.length===0
-      ?`<div style="font-size:13px;color:var(--text3);padding:12px 0;">尚無美股持倉。</div>`
-      :usStocks.map(p=>{
-        const costUSD=p.costPerUnit*p.units;
-        const costTWD=costUSD*usdTwd;
-        const cached=priceCache[p.symbol];
-        const livePrice=cached?.price;
-        const liveUSD=livePrice?livePrice*p.units:null;
-        const liveTWD=liveUSD?liveUSD*usdTwd:null;
-        const pct=livePrice?((livePrice-p.costPerUnit)/p.costPerUnit*100):null;
-        const pctColor=pct===null?"var(--text3)":pct>=0?"#00d4a0":"#f87171";
-        const pctStr=pct===null?"—":(pct>=0?"+":"")+pct.toFixed(2)+"%";
-        return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${US_COLOR};">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <div>
-              <span style="font-size:16px;font-weight:700;color:${US_COLOR};">${p.symbol}</span>
-              <span class="tag" style="margin-left:8px;background:rgba(79,142,247,.15);color:${US_COLOR};">美股</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:14px;font-weight:700;color:${pctColor};">${pctStr}</span>
-              <button class="btn-del" onclick="delPort(${p.id})">×</button>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;">
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">成本價</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text2);">${fmtUSD(p.costPerUnit)}</div>
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">即時價</div>
-              <div style="font-size:13px;font-weight:600;color:${US_COLOR};">${livePrice?fmtUSD(livePrice):"—"}</div>
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">損益</div>
-              <div style="font-size:13px;font-weight:700;color:${pctColor};">${pctStr}</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">市值（USD）</div>
-              <div style="font-size:14px;font-weight:700;color:${US_COLOR};">${liveUSD?fmtUSD(liveUSD):fmtUSD(costUSD)}</div>
-              ${liveUSD?"":`<div style="font-size:9px;color:var(--text3);">（成本估算）</div>`}
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">市值（TWD）</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text1);">${liveTWD?fmt(liveTWD):fmt(costTWD)}</div>
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}股 · 匯率 ${usdTwd.toFixed(2)}</div>
-        </div>`;}).join("");
-
-    // 加密貨幣卡片（合併同標的）
-    const cryptoMerged=Object.values(cryptos.reduce((acc,p)=>{
-      if(!acc[p.symbol]){acc[p.symbol]={...p};}
-      else{
-        const totalCost=acc[p.symbol].costPerUnit*acc[p.symbol].units+p.costPerUnit*p.units;
-        const totalUnits=acc[p.symbol].units+p.units;
-        acc[p.symbol].costPerUnit=totalCost/totalUnits; // 加權平均成本
-        acc[p.symbol].units=totalUnits;
-        acc[p.symbol].id=p.symbol; // 合併後用 symbol 當 id
-        acc[p.symbol]._merged=true;
-      }
-      return acc;
-    },{}));
-
-    const cryptoCards=cryptoMerged.length===0
-      ?`<div style="font-size:13px;color:var(--text3);padding:12px 0;">尚無加密貨幣持倉。</div>`
-      :cryptoMerged.map(p=>{
-        const cgId=CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase();
-        const cached=priceCache["crypto_"+cgId];
-        const liveUSD=cached?.price;
-        const liveTWD=liveUSD?liveUSD*p.units*usdTwd:null;
-        const costTWD=p.costPerUnit*p.units; // 成本是台幣
-        // 損益：需要把成本台幣換算成USD來跟liveUSD比較
-        const costUSD=p.costPerUnit/usdTwd;
-        const pct=liveUSD?((liveUSD-costUSD)/costUSD*100):null;
-        const pctColor=pct===null?"var(--text3)":pct>=0?"#00d4a0":"#f87171";
-        const pctStr=pct===null?"—":(pct>=0?"+":"")+pct.toFixed(2)+"%";
-        // 找到原始所有筆記錄的 ids 用於刪除
-        const ids=cryptos.filter(c=>c.symbol===p.symbol).map(c=>c.id);
-        const delCall=ids.map(id=>`delPort(${id})`).join(";");
-        return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${CRYPTO_COLOR};">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <div>
-              <span style="font-size:16px;font-weight:700;color:${CRYPTO_COLOR};">${p.symbol}</span>
-              <span class="tag" style="margin-left:8px;background:rgba(251,191,36,.15);color:${CRYPTO_COLOR};">加密貨幣</span>
-              ${ids.length>1?`<span class="tag" style="margin-left:4px;background:rgba(255,255,255,.08);color:var(--text3);">${ids.length}筆合併</span>`:""}
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:14px;font-weight:700;color:${pctColor};">${pctStr}</span>
-              <button class="btn-del" onclick="${delCall}">×</button>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;">
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">均攤成本(TWD)</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text2);">NT${p.costPerUnit.toFixed(0)}</div>
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">即時價(USD)</div>
-              <div style="font-size:13px;font-weight:600;color:${CRYPTO_COLOR};">${liveUSD?fmtUSD(liveUSD):"—"}</div>
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">損益</div>
-              <div style="font-size:13px;font-weight:700;color:${pctColor};">${pctStr}</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">持倉成本(TWD)</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text2);">${fmt(costTWD)}</div>
-            </div>
-            <div style="background:var(--bg4);border-radius:8px;padding:8px 10px;">
-              <div style="font-size:10px;color:var(--text3);">市值(TWD)</div>
-              <div style="font-size:14px;font-weight:700;color:${CRYPTO_COLOR};">${liveTWD?fmt(liveTWD):fmt(costTWD)}</div>
-              ${!liveTWD?`<div style="font-size:9px;color:var(--text3);">成本估算</div>`:""}
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.units}顆 · CoinGecko: ${cgId}</div>
-        </div>`;}).join("");
+    const types=["us","crypto","tw","fund"];
+    const sections=types.map(type=>{
+      const list=mergePortfolio(state.portfolio.filter(p=>p.type===type));
+      const totalTWD=list.reduce((s,p)=>{
+        if(type==="us"){const c=priceCache[p.symbol];return s+(c?.price?c.price*p.units*usdTwd:p.costPerUnit*p.units*usdTwd);}
+        if(type==="crypto"){const cgId=CRYPTO_ID_MAP[p.symbol]||p.symbol.toLowerCase();const c=priceCache["crypto_"+cgId];return s+(c?.price?c.price*p.units*usdTwd:p.costPerUnit*p.units);}
+        return s+p.costPerUnit*p.units;
+      },0);
+      const color=INV_COLOR[type];
+      return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:4px;height:20px;border-radius:2px;background:${color};"></div>
+          <span style="font-size:15px;font-weight:700;color:${color};">${INV_LABEL[type]}</span>
+          ${list.length>0?`<span style="font-size:12px;color:var(--text3);margin-left:auto;">${fmt(totalTWD)}</span>`:""}
+        </div>
+        ${list.length===0?`<div style="font-size:13px;color:var(--text3);padding:8px 0 12px;">尚無${INV_LABEL[type].split(" ")[1]}持倉。</div>`:list.map(p=>invCard(p,type)).join("")}
+        <div class="glow-line"></div>`;
+    }).join("");
 
     return `
       <div class="card" style="margin-bottom:18px;">
         <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent);">新增持倉 📈</div>
-        <div style="margin-bottom:10px;">${lbl("類型")}<select id="pType"><option value="us">📈 美股（輸入股票代號，如 AAPL）</option><option value="crypto">🪙 加密貨幣（輸入幣種代號，如 BTC）</option></select></div>
+        <div style="margin-bottom:10px;">${lbl("類型")}<select data-fid="pType">
+          <option value="us">📈 美股（代號如 AAPL、TSLA）</option>
+          <option value="crypto">🪙 加密貨幣（代號如 BTC、ETH）</option>
+          <option value="tw">🏢 台股（代號如 2330）</option>
+          <option value="fund">💼 基金（基金名稱）</option>
+        </select></div>
         <div class="grid2" style="margin-bottom:10px;">
-          <div>${lbl("代號")}<input id="pSym" placeholder="AAPL 或 BTC" type="text"></div>
-          <div>${lbl("持有數量")}<input type="number" id="pUnits" placeholder="10"></div>
+          <div>${lbl("代號 / 名稱")}<input data-fid="pSym" placeholder="AAPL / BTC / 2330 / 基金名" type="text"></div>
+          <div>${lbl("持有數量 / 單位")}<input type="number" data-fid="pUnits" placeholder="10"></div>
         </div>
-        <div style="margin-bottom:14px;">${lbl("成本價（USD）")}<input type="number" id="pCost" placeholder="150"></div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:14px;padding:8px 12px;background:var(--bg4);border-radius:8px;">
-          💡 支援幣種：BTC、ETH、SOL、BNB、XRP、ADA、DOGE、MATIC、LINK、UNI、ATOM 等主流幣<br>
-          美股輸入 Yahoo Finance 代號，如 AAPL、TSLA、NVDA、META
+        <div style="margin-bottom:10px;">${lbl("成本價（美股USD，其餘NT$）")}<input type="number" data-fid="pCost" placeholder="150"></div>
+        <div style="font-size:11px;color:var(--text3);padding:8px 12px;background:var(--bg4);border-radius:8px;margin-bottom:14px;">
+          💡 美股：USD成本，自動換算TWD｜加密貨幣：TWD成本，自動抓USD即時價｜台股/基金：NT$成本
         </div>
         <button class="btn-green" onclick="submitPort()" style="width:100%;padding:13px;font-size:16px;">新增持倉</button>
       </div>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
         <button id="refreshBtn" onclick="refreshPrices()" style="padding:8px 18px;border-radius:10px;background:linear-gradient(135deg,#4f8ef7,#2563eb);color:#fff;font-size:13px;font-weight:700;">⟳ 刷新即時報價</button>
       </div>
-
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="width:4px;height:20px;border-radius:2px;background:${US_COLOR};"></div>
-        <span style="font-size:15px;font-weight:700;color:${US_COLOR};">📈 美股</span>
-        ${usStocks.length>0?`<span style="font-size:12px;color:var(--text3);margin-left:auto;">成本 ${fmtUSD(usTotalCostUSD)}</span>`:""}
-      </div>
-      ${usCards}
-      <div class="glow-line"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="width:4px;height:20px;border-radius:2px;background:${CRYPTO_COLOR};"></div>
-        <span style="font-size:15px;font-weight:700;color:${CRYPTO_COLOR};">🪙 加密貨幣</span>
-        ${cryptos.length>0?`<span style="font-size:12px;color:var(--text3);margin-left:auto;">成本 ${fmt(cryptoTotalCost)}</span>`:""}
-      </div>
-      ${cryptoCards}
-      <div class="glow-line"></div>
+      ${sections}
       <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;">
         <span style="font-size:14px;color:var(--text2);">投資組合總估值（TWD）</span>
         <span style="font-size:20px;font-weight:800;color:#a78bfa;">${fmt(portfolioValue)}</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:right;">即時匯率：1 USD = ${usdTwd.toFixed(2)} TWD · 資料來源：Yahoo Finance / CoinGecko</div>`;
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:right;">即時匯率：1 USD = ${usdTwd.toFixed(2)} TWD · Yahoo Finance / CoinGecko</div>`;
   }
 
-  // ── 圖表頁面（修正：用 pieSection 函式確保 canvas 存在）──
-  if(tab==="charts") return `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">${lbl("月份")}<input type="month" value="${filterMonth}" onchange="setMonth(this.value)" style="width:auto;padding:8px 12px;font-size:14px;margin-top:0;"></div>
-    ${pieSection("本月收支比","pie1",[dot("#00d4a0","收入",fmt(monthInc)),dot("#f87171","支出",fmt(monthExp))].join(""))}
-    <div class="glow-line"></div>
-    ${pieSection("支出分類","pie2",EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c)).map(c=>{const v=me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0);return dot(CC[c],c,monthExp>0?Math.round(v/monthExp*100)+"%":"");}).join(""))}
-    <div class="glow-line"></div>
-    ${pieSection("全部資產大類佔比","pie3",[dot("#4f8ef7","現金/銀行",fmt(totalBank)),dot("#a78bfa","投資組合",fmt(portfolioValue))].join(""))}`;
-
+  if(tab==="charts"){
+    const usVal=state.portfolio.filter(p=>p.type==="us").reduce((s,p)=>s+p.costPerUnit*p.units*usdTwd,0);
+    const cryptoVal=state.portfolio.filter(p=>p.type==="crypto").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+    const twVal=state.portfolio.filter(p=>p.type==="tw").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+    const fundVal=state.portfolio.filter(p=>p.type==="fund").reduce((s,p)=>s+p.costPerUnit*p.units,0);
+    const assetLegs=[
+      dot("#4f8ef7","現金/銀行",fmt(totalBank)),
+      usVal?dot(INV_COLOR.us,"美股",fmt(usVal)):"",
+      cryptoVal?dot(INV_COLOR.crypto,"加密貨幣",fmt(cryptoVal)):"",
+      twVal?dot(INV_COLOR.tw,"台股",fmt(twVal)):"",
+      fundVal?dot(INV_COLOR.fund,"基金",fmt(fundVal)):"",
+    ].filter(Boolean).join("");
+    return `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">${lbl("月份")}<input type="month" value="${filterMonth}" onchange="setMonth(this.value)" style="width:auto;padding:8px 12px;font-size:14px;margin-top:0;"></div>
+      ${pieSection("本月收支比","pie1",[dot("#00d4a0","收入",fmt(monthInc)),dot("#f87171","支出",fmt(monthExp))].join(""))}
+      <div class="glow-line"></div>
+      ${pieSection("支出分類","pie2",EXPENSE_CATS.filter(c=>me.some(e=>e.cat===c)).map(c=>{const v=me.filter(e=>e.cat===c).reduce((s,e)=>s+e.amt,0);return dot(CC[c],c,monthExp>0?Math.round(v/monthExp*100)+"%":"");}).join(""))}
+      <div class="glow-line"></div>
+      ${pieSection("全部資產大類佔比","pie3",assetLegs)}`;
+  }
   return "";
 }
 
@@ -505,26 +442,18 @@ function render(){
   const root=document.getElementById("root");
   if(!root)return;
   if(!user){root.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#12121f,#0a0a14);"><div style="text-align:center;padding:40px;"><div style="font-size:64px;margin-bottom:16px;filter:drop-shadow(0 0 20px #00d4a060);">⚾</div><div style="font-size:26px;font-weight:900;margin-bottom:6px;">個人財務記分板</div><div style="font-size:13px;color:var(--text3);margin-bottom:36px;letter-spacing:1px;">PERSONAL FINANCE SCOREBOARD</div><button onclick="login()" style="padding:14px 36px;border-radius:12px;background:linear-gradient(135deg,#00d4a0,#00b386);color:#000;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 0 24px rgba(0,212,160,.3);">使用 Google 帳號登入</button><div style="margin-top:16px;font-size:12px;color:var(--text3);">資料加密存於 Firebase · 僅你可見</div></div></div>`;return;}
-
   const{me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets}=calc();
   const content=buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,portfolioValue,totalAssets);
   const curTab=TABS.find(t=>t.id===tab)||TABS[0];
   const tabBar=`<div class="tabbar">${TABS.map(t=>`<button class="tab${tab===t.id?" active":""}" onclick="setTab('${t.id}')">${t.icon} ${t.label}</button>`).join("")}</div>`;
-
   root.innerHTML=`
     <div id="mobile-header">
       <button onclick="openMenu()" style="background:none;border:none;color:var(--text1);font-size:26px;padding:4px 8px;line-height:1;cursor:pointer;">☰</button>
-      <div style="font-size:15px;font-weight:800;color:var(--text1);">${curTab.icon} ${curTab.label}</div>
-      <div style="text-align:right;">
-        <div style="font-size:10px;color:var(--text3);">總資產</div>
-        <div style="font-size:14px;font-weight:900;color:var(--accent);">${fmt(totalAssets)}</div>
-      </div>
+      <div style="font-size:15px;font-weight:800;">${curTab.icon} ${curTab.label}</div>
+      <div style="text-align:right;"><div style="font-size:10px;color:var(--text3);">總資產</div><div style="font-size:14px;font-weight:900;color:var(--accent);">${fmt(totalAssets)}</div></div>
     </div>
     <div id="side-menu">
-      <div style="padding:16px 20px 20px;border-bottom:1px solid var(--border);">
-        <div style="font-size:16px;font-weight:900;color:var(--accent);">⚾ 個人財務記分板</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">${user.displayName||""}</div>
-      </div>
+      <div style="padding:16px 20px 20px;border-bottom:1px solid var(--border);"><div style="font-size:16px;font-weight:900;color:var(--accent);">⚾ 個人財務記分板</div><div style="font-size:12px;color:var(--text3);margin-top:4px;">${user.displayName||""}</div></div>
       ${TABS.map(t=>`<button class="menu-item${tab===t.id?" active":""}" onclick="setTabMenu('${t.id}')">${t.icon} ${t.label}</button>`).join("")}
       <button class="menu-item" onclick="logout()" style="color:#f87171;margin-top:8px;">🚪 登出</button>
     </div>
@@ -533,26 +462,16 @@ function render(){
     <div id="desktop-wrap" style="max-width:760px;margin:0 auto;padding:20px 16px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
         <div style="font-size:32px;filter:drop-shadow(0 0 12px #00d4a080);">⚾</div>
-        <div>
-          <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;">個人財務記分板</div>
-          <div style="font-size:12px;color:var(--text3);letter-spacing:.5px;">PERSONAL FINANCE SCOREBOARD</div>
-        </div>
+        <div><div style="font-size:22px;font-weight:900;letter-spacing:-.5px;">個人財務記分板</div><div style="font-size:12px;color:var(--text3);letter-spacing:.5px;">PERSONAL FINANCE SCOREBOARD</div></div>
         <div style="margin-left:auto;display:flex;align-items:center;gap:16px;">
-          <div style="text-align:right;">
-            <div style="font-size:11px;color:var(--text3);">總資產</div>
-            <div style="font-size:20px;font-weight:900;color:var(--accent);">${fmt(totalAssets)}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:12px;color:var(--text2);">${user.displayName||""}</div>
-            <button onclick="logout()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;">登出</button>
-          </div>
+          <div style="text-align:right;"><div style="font-size:11px;color:var(--text3);">總資產</div><div style="font-size:20px;font-weight:900;color:var(--accent);">${fmt(totalAssets)}</div></div>
+          <div style="text-align:right;"><div style="font-size:12px;color:var(--text2);">${user.displayName||""}</div><button onclick="logout()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;">登出</button></div>
         </div>
       </div>
       ${tabBar}
       <div>${content}</div>
       <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center;">⚾ 個人財務記分板 · Firebase 雲端同步</div>
-    </div>
-  `;
+    </div>`;
   if(tab==="charts") setTimeout(()=>renderCharts(me,totalBank,monthInc,monthExp,portfolioValue),150);
 }
 </script>
