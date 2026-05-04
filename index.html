@@ -534,7 +534,7 @@ function buildContent(me,totalBank,monthInc,monthExp,savings,avg,monthCredit,por
     const twVal=state.portfolio.filter(p=>p.type==="tw").reduce((s,p)=>s+p.costPerUnit*p.units,0);
     const fundVal=state.portfolio.filter(p=>p.type==="fund").reduce((s,p)=>s+p.costPerUnit*p.units,0);
     const assetLegs=[
-      dot("#4f8ef7","現金/銀行",fmt(totalBank)),
+      dot("#4f55f7","現金/銀行",fmt(totalBank)),
       usVal?dot(INV_COLOR.us,"美股",fmt(usVal)):"",
       cryptoVal?dot(INV_COLOR.crypto,"加密貨幣",fmt(cryptoVal)):"",
       twVal?dot(INV_COLOR.tw,"台股",fmt(twVal)):"",
